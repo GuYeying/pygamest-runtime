@@ -1,0 +1,58 @@
+[package]
+name = "pygamest-runtime"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/GuYeying/pygamest-runtime"
+description = "pygamest 游戏运行时（生产宿主）——入口编译期加密嵌入 + 散文件清单形态，锁死无 CLI/REPL/脚本面"
+
+[dependencies]
+# 全量 pygame 库面（gui + 2d/3d 物理 + net/dialog 无条件注册——2026-11-02
+# 宿主方向 feature 废除定约）；不带 stdlib-full = 裁剪版 stdlib。
+# dev 仓以 default-features = false 消费（只借 Host trait + 驱动，不回灌
+# 它的默认全量轴——feature 并集从此可控）
+pygamest = { path = "../pygamest", default-features = false, features = ["gui", "physics2d", "physics3d"] }
+pygamest-dev = { path = "../pygamest-dev", default-features = false }
+starfish-pygame = { path = "../starfish/crates/starfish-pygame" }
+starfish-io = { path = "../starfish/crates/starfish-io" }
+starfish-debug = { path = "../starfish/crates/starfish-debug" }
+starfish-std = { path = "../starfish/crates/starfish-std" }
+starfish-we = { path = "../starfish/crates/starfish-we" }
+chacha20poly1305 = { version = "0.10", default-features = false, features = ["alloc"] }
+
+# 编译期入口加密（build.rs：main.py → SFXE1 密文 → include_bytes! 嵌入
+# ——磁盘零 main 文件、二进制零明文，2026-11-03 用户定约）
+[build-dependencies]
+chacha20poly1305 = { version = "0.10", default-features = false, features = ["alloc"] }
+
+[features]
+# 全量标准库（开发/调试用——生产导出缺省不含）
+stdlib-full = ["pygamest/stdlib-full"]
+
+# Web 构建前置（app_entry! 的 start 属性路径在用户 crate 解析；版本
+# 与依赖树严格一致——wasm-bindgen-cli 自检同规）
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.129"
+wasm-bindgen-futures = "=0.4.79"
+
+[profile.release]
+strip = true
+lto = true
+
+[[bin]]
+name = "runtime"
+path = "src/bin/runtime.rs"
+
+# Android 形态 = 同源 cdylib（NativeActivity dlsym android_main——app_entry!
+# 的 android 分支自管窗口/事件，无 Java 注入）。路径与 bin 同源：一个源码
+# 两种链接产物。
+[[example]]
+name = "runtime_android"
+path = "src/bin/runtime.rs"
+crate-type = ["cdylib"]
+
+# Android：app_entry! android 分支需要 we（AndroidApp/android_init——
+# NativeActivity 自管理装配）；资产句柄移交由 starfish-we → io 内部完成，
+# 壳零额外依赖（external_size 等参数通道同源）
+[target.'cfg(target_os = "android")'.dependencies]
+starfish-std = { path = "../starfish/crates/starfish-std", features = ["we"] }

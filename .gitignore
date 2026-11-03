@@ -1,0 +1,17 @@
+# 构建产物
+/target/
+/build*.log
+
+# 分发产物
+/dist/
+
+# 密钥（每游戏一份在 examples/<游戏>/assets.key；build_windows.py
+# 缺失自动生成——**分发勿携、永不入库**）
+assets.key
+examples/*/assets.key
+*.log
+__pycache__/
+
+# cargo ndk 产物（.so 交付件）
+android/jniLibs/
+*.so
