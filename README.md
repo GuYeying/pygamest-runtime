@@ -23,6 +23,16 @@ hello_word/
 - 加密实现唯一归属 [pygamest](https://github.com/GuYeying/pygamest) 的
   `starfish-pygame::sfx`（加密红线：引擎侧其余 crate 零加密语义）
 
+## 从源码构建（使用者）
+
+```bash
+git clone https://github.com/GuYeying/pygamest-runtime
+cd pygamest-runtime
+cargo build --release --bin runtime     # 首次构建自动拉取 GitHub 依赖（按 Cargo.lock 锁定版本）
+```
+
+无需手动下载任何依赖仓库——跨仓依赖以 git 形式声明并锁定在 Cargo.lock。
+
 ## 三平台打包
 
 ```
@@ -46,5 +56,10 @@ python android/build.py             # Android：target/apk/<游戏>.apk（Native
 | [rapier-starfish-debug](https://github.com/GuYeying/rapier-starfish-debug) | Rapier 物理适配 + 通用 debug 渲染 |
 
 ## 协议
+
+MIT OR Apache-2.0 双协议（见 LICENSE-MIT / LICENSE-APACHE）。
+
+> 本软件按"现状"提供，不含任何形式的担保；游戏资源与分发行的使用、
+> 修改与再分发遵循上述协议与资源许可。
 
 MIT OR Apache-2.0 双协议（见 LICENSE-MIT / LICENSE-APACHE）。
