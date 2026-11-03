@@ -11,13 +11,13 @@ description = "pygamest 游戏运行时（生产宿主）——入口编译期�
 # 宿主方向 feature 废除定约）；不带 stdlib-full = 裁剪版 stdlib。
 # dev 仓以 default-features = false 消费（只借 Host trait + 驱动，不回灌
 # 它的默认全量轴——feature 并集从此可控）
-pygamest = { path = "../pygamest", default-features = false, features = ["gui", "physics2d", "physics3d"] }
-pygamest-dev = { path = "../pygamest-dev", default-features = false }
-starfish-pygame = { path = "../starfish/crates/starfish-pygame" }
-starfish-io = { path = "../starfish/crates/starfish-io" }
-starfish-debug = { path = "../starfish/crates/starfish-debug" }
-starfish-std = { path = "../starfish/crates/starfish-std" }
-starfish-we = { path = "../starfish/crates/starfish-we" }
+pygamest = { git = "https://github.com/GuYeying/pygamest", default-features = false, features = ["gui", "physics2d", "physics3d"] }
+pygamest-dev = { git = "https://github.com/GuYeying/pygamest-dev", default-features = false }
+starfish-pygame = { git = "https://github.com/GuYeying/starfish" }
+starfish-io = { git = "https://github.com/GuYeying/starfish" }
+starfish-debug = { git = "https://github.com/GuYeying/starfish" }
+starfish-std = { git = "https://github.com/GuYeying/starfish" }
+starfish-we = { git = "https://github.com/GuYeying/starfish" }
 chacha20poly1305 = { version = "0.10", default-features = false, features = ["alloc"] }
 
 # 编译期入口加密（build.rs：main.py → SFXE1 密文 → include_bytes! 嵌入
@@ -55,4 +55,4 @@ crate-type = ["cdylib"]
 # NativeActivity 自管理装配）；资产句柄移交由 starfish-we → io 内部完成，
 # 壳零额外依赖（external_size 等参数通道同源）
 [target.'cfg(target_os = "android")'.dependencies]
-starfish-std = { path = "../starfish/crates/starfish-std", features = ["we"] }
+starfish-std = { git = "https://github.com/GuYeying/starfish", features = ["we"] }

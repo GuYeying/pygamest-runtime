@@ -15,3 +15,6 @@ __pycache__/
 # cargo ndk 产物（.so 交付件）
 android/jniLibs/
 *.so
+
+# 开发者本机依赖覆盖（paths）
+.cargo/config.toml
