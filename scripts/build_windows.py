@@ -83,7 +83,7 @@ def main():
     plat_name = "Windows" if exe_suffix else "Linux"
     print(f"=== [{name}] {plat_name} 构建（散文件 + 清单形态） ===")
     print("[1/5] cargo build --bin runtime")
-    subprocess.run(["cargo", "build", "--release", "--bin", "runtime"],
+    subprocess.run(["cargo", "+nightly", "build", "--release", "--bin", "runtime"],
                    check=True, cwd=crate_root)
     runtime_exe = os.path.join(crate_root, "target", "release", "runtime" + exe_suffix)
 

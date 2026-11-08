@@ -183,7 +183,7 @@ def main():
 
     check_bindgen_version()
     print("=== 构建 wasm runtime（bin runtime）===")
-    sh(["cargo", "build", "--release", "--target", "wasm32-unknown-unknown",
+    sh(["cargo", "+nightly", "build", "--release", "--target", "wasm32-unknown-unknown",
         "--bin", "runtime"], tail=1)
     wasm = TARGET_DIR / "runtime.wasm"
     if not wasm.is_file():

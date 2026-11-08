@@ -18,3 +18,4 @@ android/jniLibs/
 
 # 开发者本机依赖覆盖（paths）
 .cargo/config.toml
+.cargo/

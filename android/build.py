@@ -115,7 +115,7 @@ def main():
     so = JNI_LIBS / ABI / SO_NAME
     if not args.skip_build:
         print(f"=== 1/5 cargo ndk build ({ABI}，NativeActivity 自管理 cdylib) ===")
-        sh(["cargo", "ndk", "-t", ABI, "-P", "26", "-o", str(JNI_LIBS),
+        sh(["cargo", "+nightly", "ndk", "-t", ABI, "-P", "26", "-o", str(JNI_LIBS),
             "--", "build", "--release", "--example", "runtime_android"], tail=1)
     if not so.is_file():
         sys.exit(f"[FAIL] .so 缺失: {so}")

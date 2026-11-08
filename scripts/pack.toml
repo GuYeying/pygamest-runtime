@@ -1,7 +1,7 @@
 # pack.toml——游戏打包配置（单一配置源：build.rs / build_windows.py 同读）
 
 [game]
-name = "hello_word"
+name = "anim3"
 entry = "main"
 
 [build]
@@ -17,16 +17,16 @@ out = "dist"
 ignore = ["*.log"]
 
 [scripts]
-root = "examples/hello_word"
+root = "examples/anim3"
 
 [resources]
 # dir 末段目录名 = 发行资源目录名（build.rs 解析同名值 → RES_DIR_NAME 编译进壳）
-dir = "examples/hello_word/assets"
+dir = "examples/anim3/assets"
 
 [windows]
 
 [android]
-package = "org.runtime.hello_word"
+package = "org.runtime.anim3"
 # 横竖屏（Android 原生 screenOrientation 取值）——与 dev 侧 --orientation
 # 同语义：landscape / portrait / sensorLandscape / sensorPortrait…
 orientation = "sensorLandscape"

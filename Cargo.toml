@@ -11,7 +11,7 @@ description = "pygamest 游戏运行时（生产宿主）——入口编译期�
 # 宿主方向 feature 废除定约）；不带 stdlib-full = 裁剪版 stdlib。
 # dev 仓以 default-features = false 消费（只借 Host trait + 驱动，不回灌
 # 它的默认全量轴——feature 并集从此可控）
-pygamest = { git = "https://github.com/GuYeying/pygamest", default-features = false, features = ["gui", "physics2d", "physics3d"] }
+pygamest = { git = "https://github.com/GuYeying/pygamest", default-features = false, features = ["gui", "physics2d", "physics3d", "spine", "live2d", "ozz"] }
 pygamest-dev = { git = "https://github.com/GuYeying/pygamest-dev", default-features = false }
 starfish-pygame = { git = "https://github.com/GuYeying/starfish" }
 starfish-io = { git = "https://github.com/GuYeying/starfish" }
