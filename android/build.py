@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""pygamest-runtime Android 打包（**NativeActivity 自管理形态**）。
+"""pygamest-runtime Android 打包（**Java 宿主 + JNI 嵌入面**——卓易通兼容形态）。
 
 与 dev 的 Java UI 注入形态的根本差异：
   - 清单 = android.app.NativeActivity（hasCode=false，无 dex）——dlopen
@@ -73,7 +73,7 @@ def best_subdir(base: Path, prefix: str) -> Path:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="pygamest-runtime Android 打包（NativeActivity 自管理）")
+    ap = argparse.ArgumentParser(description="pygamest-runtime Android 打包（Java 宿主 + JNI 嵌入面）")
     ap.add_argument("--skip-build", action="store_true", help="复用现有 .so（调试迭代）")
     ap.add_argument("--install", action="store_true", help="构建后 adb install -r 并启动")
     ap.add_argument("--game", default="hello_word", help="游戏目录名（examples/<game>）")
@@ -114,21 +114,24 @@ def main():
     # 1) 交叉编译（release 铁律；example runtime_android = bin 同源 cdylib）
     so = JNI_LIBS / ABI / SO_NAME
     if not args.skip_build:
-        print(f"=== 1/5 cargo ndk build ({ABI}，NativeActivity 自管理 cdylib) ===")
+        print(f"=== 1/6 cargo ndk build ({ABI}，Java 宿主 cdylib) ===")
         sh(["cargo", "+nightly", "ndk", "-t", ABI, "-P", "26", "-o", str(JNI_LIBS),
             "--", "build", "--release", "--example", "runtime_android"], tail=1)
     if not so.is_file():
         sys.exit(f"[FAIL] .so 缺失: {so}")
-    print("=== 2/5 llvm-strip + android_main 自检 ===")
+    print("=== 2/6 llvm-strip + JNI 符号自检 ===")
     sh([str(ndk_bin / "llvm-strip"), str(so)])
     nm = sh([str(ndk_bin / "llvm-nm"), "-D", str(so)])
-    if "T android_main" not in nm:
-        sys.exit("[FAIL] android_main 未导出（NativeActivity 无法启动）——检查 app_entry! 接线")
-    print("[nm] android_main 已导出 ✓")
+    for sym in ("Java_com_starfish_runtime_RtHost_runEmbedded",
+                "Java_com_starfish_runtime_RtHost_attachSurface",
+                "Java_com_starfish_runtime_RtHost_injectTouch"):
+        if f"T {sym}" not in nm:
+            sys.exit(f"[FAIL] JNI 符号未导出: {sym}")
+    print("[nm] JNI 符号面完整 ✓")
 
     # 3) 脚本+资源 → APK assets/<res>/（散文件 + 清单——与桌面同构；
     #    .so 纯净无附加体，重复打包天然幂等）
-    print("=== 3/5 脚本+资源 → APK assets（散文件+清单） ===")
+    print("=== 3/6 脚本+资源 → APK assets（散文件+清单） ===")
     res_dir = game_dir / "assets"
     res_name = res_dir.name
     prefix = res_name  # 资源逻辑路径 = 游戏根视角的 assets/xxx
@@ -196,8 +199,35 @@ def main():
     _write_sfx(res_out / "_manifest.sfx", ("\n".join(physical) + "\n").encode("ascii"))
     print(f"[OK] 加密清单 {len(payload)} 项（payload）/ {len(physical)} 文件（manifest 展开表）")
 
-    # 4) manifest 替换（lib_name 根治点 + orientation 配置）+ aapt2 link
-    print("=== 4/5 aapt2 link（lib_name/orientation 对齐）===")
+    # 4) Java 宿主编译（javac → d8 → classes.dex——卓易通兼容形态）
+    print("=== 4a/6 javac ===")
+    java_src = ANDROID / "java"
+    obj = WORK / "obj"
+    if obj.is_dir():
+        shutil.rmtree(obj)
+    obj.mkdir(parents=True)
+    staged = []
+    for s in sorted(java_src.rglob("*.java")):
+        rel = s.relative_to(java_src)
+        sp = WORK / "java" / rel
+        sp.parent.mkdir(parents=True, exist_ok=True)
+        sp.write_text(s.read_text(encoding="utf-8"), encoding="utf-8")
+        staged.append(str(sp))
+    sh(["javac", "--release", "11", "-classpath", str(jar), "-d", str(obj), *staged])
+    print("=== 4b/6 d8 ===")
+    dex_dir = WORK / "dex"
+    if dex_dir.is_dir():
+        shutil.rmtree(dex_dir)
+    dex_dir.mkdir(parents=True)
+    class_files = [str(cf) for cf in obj.rglob("*.class")]
+    sh([str(bt / "d8.bat"), "--release", "--lib", str(jar), "--min-api", "26",
+        "--output", str(dex_dir), *class_files])
+    dex = dex_dir / "classes.dex"
+    if not dex.is_file():
+        sys.exit("[FAIL] classes.dex 未产出")
+
+    # 5) manifest 替换（orientation/game/版本）+ aapt2 link
+    print("=== 5/6 aapt2 link（orientation 对齐）===")
     WORK.mkdir(parents=True, exist_ok=True)
     ver_code = time.strftime("%m%d%H%M%S")
     build_id = "rt-" + time.strftime("%Y%m%d-%H%M%S")
@@ -219,14 +249,16 @@ def main():
         link_args.append(str(res_zip))
     sh(link_args)
 
-    # 5) 组装（仅 .so——hasCode=false 无 dex）+ zipalign + 签名 + lib_name 自检
-    print("=== 5/5 组装 + zipalign + apksigner ===")
+    # 6) 组装（.so + classes.dex）+ zipalign + 签名 + 结构自检
+    print("=== 6/6 组装 + zipalign + apksigner ===")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     final = OUT_DIR / f"{args.game}.apk"
     tmp_full = WORK / "full.apk"
     with zipfile.ZipFile(base_apk) as zb, zipfile.ZipFile(tmp_full, "w") as zout:
         for item in zb.infolist():
             zout.writestr(item, zb.read(item.filename))
+        zout.writestr("classes.dex", dex.read_bytes(),
+                      compress_type=zipfile.ZIP_DEFLATED)
         zout.writestr(f"lib/{ABI}/{SO_NAME}", so.read_bytes(),
                       compress_type=zipfile.ZIP_DEFLATED)
     aligned = WORK / "aligned.apk"
@@ -240,18 +272,21 @@ def main():
     badging = subprocess.run([str(bt / "aapt2.exe"), "dump", "xmltree", "--file",
                               "AndroidManifest.xml", str(final)],
                              capture_output=True, text=True, errors="replace")
-    if f'"{LIB_NAME}"' not in badging.stdout:
-        sys.exit("[FAIL] lib_name 自检失败——禁止分发")
-    print(f"[自检] lib_name={LIB_NAME} ✓ orientation={orientation} ✓")
+    if "com.starfish.runtime.MainActivity" not in badging.stdout:
+        sys.exit("[FAIL] activity 自检失败——禁止分发")
+    with zipfile.ZipFile(final) as zf:
+        if "classes.dex" not in zf.namelist():
+            sys.exit("[FAIL] classes.dex 缺失——禁止分发")
+    print(f"[自检] activity=MainActivity ✓ dex ✓ orientation={orientation} ✓")
     tmp_full.unlink(missing_ok=True)
     aligned.unlink(missing_ok=True)
-    print(f"[DONE] {final}（{final.stat().st_size // 1024 // 1024} MB；脚本+资源 assets 展开，NativeActivity 自管理）")
+    print(f"[DONE] {final}（{final.stat().st_size // 1024 // 1024} MB；Java 宿主 + JNI 嵌入面，脚本+资源 assets 展开）")
 
     if args.install:
         adb = "D:/android-tools/platform-tools/adb.exe"
         sh([adb, "install", "-r", str(final)], tail=1)
         sh([adb, "shell", "am", "start",
-            "-n", f"com.starfish.runtime/android.app.NativeActivity"], tail=1)
+            "-n", f"com.starfish.runtime/.MainActivity"], tail=1)
 
 
 if __name__ == "__main__":

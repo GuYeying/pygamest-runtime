@@ -4327,7 +4327,10 @@ dependencies = [
 name = "pygamest-runtime"
 version = "0.1.1"
 dependencies = [
+ "android-activity",
  "chacha20poly1305",
+ "jni-sys 0.3.1",
+ "ndk-context",
  "pygamest",
  "pygamest-dev",
  "starfish-debug 0.9.63 (git+https://github.com/GuYeying/starfish)",

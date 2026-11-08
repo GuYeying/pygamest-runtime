@@ -43,16 +43,24 @@ lto = true
 name = "runtime"
 path = "src/bin/runtime.rs"
 
-# Android 形态 = 同源 cdylib（NativeActivity dlsym android_main——app_entry!
-# 的 android 分支自管窗口/事件，无 Java 注入）。路径与 bin 同源：一个源码
-# 两种链接产物。
+# Android 形态 = **Java 宿主 + JNI 嵌入面**（卓易通兼容形态，2026-11-08
+# 定约——NativeActivity 纯原生形态在卓易通秒闪退实测；dev 同 Java 形态
+# 真机实证完美）。源 = examples/runtime_android.rs；入口 main.py 密文
+# 仍嵌 .so（build.rs 同款），代码面 = JNI attachSurface/runEmbedded。
 [[example]]
 name = "runtime_android"
-path = "src/bin/runtime.rs"
+path = "examples/runtime_android.rs"
 crate-type = ["cdylib"]
 
-# Android：app_entry! android 分支需要 we（AndroidApp/android_init——
-# NativeActivity 自管理装配）；资产句柄移交由 starfish-we → io 内部完成，
-# 壳零额外依赖（external_size 等参数通道同源）
+# Android 宿主面：embedded（外部 Surface 注入门面——starfish-we 门面 +
+# pygamest-dev mobile 模块）；jni-sys = JNI 签名；ndk-context = JNI 消费
+# 方（cpal 音频等）的 Context 绑定（nativeInitContext 注入——嵌入形态
+# 无 glue 无人初始化，缺了脚本一碰音频即 panic，dev 真机实证）
 [target.'cfg(target_os = "android")'.dependencies]
 starfish-std = { git = "https://github.com/GuYeying/starfish", features = ["we"] }
+starfish-we = { git = "https://github.com/GuYeying/starfish", features = ["embedded"] }
+jni-sys = "0.3"
+ndk-context = "0.1.1"
+# android_main 符号 satisfy 的类型来源（AndroidApp——空实现，JNI 形态
+# 不走 NativeActivity 路径）
+android-activity = "0.6"

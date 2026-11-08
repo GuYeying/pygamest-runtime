@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  pygame-rs-runtime Android 清单（**NativeActivity 自管理形态**）：
-  android.app.NativeActivity 是系统自带 Activity，dlopen lib/<lib_name>.so
-  并调用导出的 android_main——无自有 Java/Kotlin、无代码注入、无 surface/
-  事件注入（starfish-we 经 android_native_app_glue 自管窗口与输入）。
-  脚本/资源 = 加密 SFIX1 包**追加在 .so 尾部**（启动自读，与桌面 trailer
-  同源）；hasCode=false = 纯原生（无 dex）。
+  pygame-rs-runtime Android 清单（**Java 宿主 + JNI 嵌入面**——卓易通
+  兼容形态，2026-11-08 定约）：兼容层对标准 Java Activity 支持最好
+  （pygamest-dev 同形态真机实证完美）；NativeActivity 纯原生形态在
+  卓易通秒闪退（实测）。hasCode=true（dex）+ MainActivity 全屏
+  SurfaceView → JNI attachSurface/runEmbedded；入口 main.py 密文仍
+  嵌 .so（build.rs 编译期），APK assets/ = 加密散件（Java 递归拷
+  filesDir 后 io 哈希链直达——桌面 dist 同构布局）。
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.starfish.runtime"
@@ -24,20 +25,17 @@
 
     <application
         android:label="__GAME_NAME__"
-        android:hasCode="false"
+        android:hasCode="true"
         android:requestLegacyExternalStorage="true"
         android:extractNativeLibs="true">
 
         <activity
-            android:name="android.app.NativeActivity"
+            android:name="com.starfish.runtime.MainActivity"
             android:exported="true"
             android:launchMode="singleInstance"
             android:screenOrientation="__ORIENTATION__"
             android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize"
             android:theme="@style/StarfishTheme">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="__LIB_NAME__" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
