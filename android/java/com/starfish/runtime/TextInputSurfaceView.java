@@ -18,8 +18,6 @@ class TextInputSurfaceView extends SurfaceView {
 
     TextInputSurfaceView(Context ctx, TextSink sink) {
         super(ctx);
-        setFocusable(true);
-        setFocusableInTouchMode(true);
         this.sink = sink;
     }
 
@@ -36,6 +34,11 @@ class TextInputSurfaceView extends SurfaceView {
             @Override
             public boolean commitText(CharSequence text, int newCursorPosition) {
                 sink.onText(text.toString());
+                return true;
+            }
+            @Override
+            public boolean deleteSurroundingText(int beforeLength, int afterLength) {
+                RtHost.injectBackspace();
                 return true;
             }
         };

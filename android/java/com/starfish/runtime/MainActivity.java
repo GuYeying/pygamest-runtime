@@ -150,19 +150,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private float downX, downY;
     private long downAt;
 
-    /** 点按呼出软键盘（IME 集成——文本输入场景；长按/拖动不触发） */
-    private void showKeyboard() {
-        try {
-            sv.requestFocus();
-            android.view.inputmethod.InputMethodManager imm =
-                    (android.view.inputmethod.InputMethodManager)
-                            getSystemService(INPUT_METHOD_SERVICE);
-            imm.showSoftInput(sv, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
-            log("showKeyboard 请求已发");
-        } catch (Exception e) {
-            log("showKeyboard 失败: " + e);
-        }
-    }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
@@ -172,7 +160,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         else if (a == MotionEvent.ACTION_MOVE) action = 1;
         else if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) action = 2;
         else return false;
-        // 点按呼出软键盘（IME 集成；长按/拖动不触发）
+        // 点按弹出文本输入对话框（原生 EditText——完整 IME 能力：
+        // 删除/粘贴/中文/选区；确定后 injectText 回投脚本层）
         if (a == MotionEvent.ACTION_DOWN) {
             downX = e.getX(); downY = e.getY();
             downAt = android.os.SystemClock.uptimeMillis();
@@ -181,9 +170,29 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 && android.os.SystemClock.uptimeMillis() - downAt < 250
                 && Math.abs(e.getX() - downX) < 24
                 && Math.abs(e.getY() - downY) < 24) {
-            showKeyboard();
+            showTextDialog();
         }
         RtHost.injectTouch(action, e.getX(), e.getY());
         return true;
+    }
+
+    /** 弹出文本输入对话框（原生 EditText——完整 IME 能力） */
+    private void showTextDialog() {
+        runOnUiThread(() -> {
+            try {
+                android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(this);
+                final android.widget.EditText et = new android.widget.EditText(this);
+                et.setText("");
+                b.setTitle("文本输入").setView(et)
+                 .setPositiveButton("确定", (d, w) -> {
+                     String text = et.getText().toString();
+                     if (!text.isEmpty()) RtHost.injectText(text);
+                 })
+                 .setNegativeButton("取消", null)
+                 .show();
+            } catch (Exception e) {
+                android.util.Log.e("RtActivity", "showTextDialog", e);
+            }
+        });
     }
 }

@@ -318,6 +318,14 @@ pub extern "system" fn Java_com_starfish_runtime_RtHost_runEmbedded(
 /// IME 提交文本注入（TextInput 事件——TextInputSurfaceView 的
 /// InputConnection.commitText 转发）
 #[no_mangle]
+pub extern "system" fn Java_com_starfish_runtime_RtHost_injectBackspace(
+    _env: jni_sys::JNIEnv,
+    _clazz: jni_sys::jclass,
+) {
+    starfish_we::embedded::inject_backspace();
+}
+
+#[no_mangle]
 pub extern "system" fn Java_com_starfish_runtime_RtHost_injectText(
     env: jni_sys::JNIEnv,
     _clazz: jni_sys::jclass,

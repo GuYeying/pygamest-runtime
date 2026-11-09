@@ -50,6 +50,9 @@ public final class RtHost {
      *  InputConnection.commitText 转发） */
     public static native void injectText(String text);
 
+    /** IME 退格注入（deleteSurroundingText 转发——Backspace 事件） */
+    public static native void injectBackspace();
+
     /** 请求停止当前运行（帧边界收口） */
     public static native void stop();
 
