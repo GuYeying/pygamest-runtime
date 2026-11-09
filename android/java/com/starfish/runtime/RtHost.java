@@ -12,10 +12,12 @@ public final class RtHost {
     private RtHost() {}
 
     private static boolean contextBound = false;
+    private static android.content.Context appContext;
 
     /** 绑定宿主 Context（ndk-context 初始化；cpal 等 JNI 消费方依赖
      *  ——嵌入形态必调一次；包装守卫防二次初始化断言） */
     public static void initContext(android.content.Context ctx) {
+        appContext = ctx;
         if (contextBound) return;
         contextBound = true;
         nativeInitContext(ctx);
@@ -35,9 +37,7 @@ public final class RtHost {
     /** io 基准目录（filesDir——APK assets 递归拷贝落点，哈希链直达） */
     public static native void setBaseDir(String path);
 
-    /** 诊断落盘目录（runEmbedded 前调用一次）：嵌入形态无 glue，stdout
-     *  无 logcat 重定向——引擎诊断同步落 <dir>/dev_log.txt。建议传
-     *  /sdcard/Download（用户可见）或 getExternalFilesDir(null) */
+    /** 诊断落盘目录（runEmbedded 前调用一次） */
     public static native void setLogDir(String dir);
 
     /** 运行嵌入入口（main.py 密文嵌 .so——解密点火，引擎自起线程） */
@@ -52,4 +52,35 @@ public final class RtHost {
 
     /** 请求停止当前运行（帧边界收口） */
     public static native void stop();
+
+    // ── 文本输入对话框（原生 EditText 组合方案——脚本 start_text_dialog
+    //    触发，JNI 桥上叫本方法；全 UI 线程执行） ──
+    private static android.widget.EditText dialogEdit;
+
+    /** 弹出文本对话框（预填 current；确定 → textDialogResult JNI 回投）。
+     *  **须在 UI 线程调用**——JNI 桥已 Handler.post 到主线程。 */
+    public static void showTextDialog(String current) {
+        final android.content.Context ctx = appContext;
+        if (ctx == null) return;
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+            try {
+                android.widget.EditText et = new android.widget.EditText(ctx);
+                et.setText(current);
+                new android.app.AlertDialog.Builder(ctx, android.R.style.Theme_Material_Dialog)
+                        .setTitle("文本输入")
+                        .setView(et)
+                        .setPositiveButton("确定", (d, w) -> {
+                            dialogEdit = null;
+                            textDialogResult(et.getText().toString());
+                        })
+                        .setNegativeButton("取消", (d, w) -> { dialogEdit = null; })
+                        .show();
+                dialogEdit = et;
+            } catch (Exception e) {
+                android.util.Log.e("RtHost", "showTextDialog", e);
+            }
+        });
+    }
+
+    private static native void textDialogResult(String text);
 }
