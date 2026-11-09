@@ -22,7 +22,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         android.util.Log.i(TAG, s);
     }
 
-    private SurfaceView sv;
+    private TextInputSurfaceView sv;
     private int activeGen = 0;
     private int myGen = 0;
     private boolean runSent = false;
@@ -52,7 +52,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(0xFF000000);
-        sv = new SurfaceView(this);
+        sv = new TextInputSurfaceView(this, RtHost::injectText);
         sv.getHolder().addCallback(this);
         root.addView(sv, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -147,15 +147,41 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         RtHost.detachSurface(holder.getSurface());
     }
 
+    private float downX, downY;
+    private long downAt;
+
+    /** 点按呼出软键盘（IME 集成——文本输入场景；长按/拖动不触发） */
+    private void showKeyboard() {
+        try {
+            sv.requestFocus();
+            android.view.inputmethod.InputMethodManager imm =
+                    (android.view.inputmethod.InputMethodManager)
+                            getSystemService(INPUT_METHOD_SERVICE);
+            imm.showSoftInput(sv, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+            log("showKeyboard 请求已发");
+        } catch (Exception e) {
+            log("showKeyboard 失败: " + e);
+        }
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+        int a = e.getActionMasked();
         int action;
-        switch (e.getAction()) {
-            case MotionEvent.ACTION_DOWN: action = 0; break;
-            case MotionEvent.ACTION_MOVE: action = 1; break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL: action = 2; break;
-            default: return false;
+        if (a == MotionEvent.ACTION_DOWN) action = 0;
+        else if (a == MotionEvent.ACTION_MOVE) action = 1;
+        else if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) action = 2;
+        else return false;
+        // 点按呼出软键盘（IME 集成；长按/拖动不触发）
+        if (a == MotionEvent.ACTION_DOWN) {
+            downX = e.getX(); downY = e.getY();
+            downAt = android.os.SystemClock.uptimeMillis();
+        }
+        if (a == MotionEvent.ACTION_UP
+                && android.os.SystemClock.uptimeMillis() - downAt < 250
+                && Math.abs(e.getX() - downX) < 24
+                && Math.abs(e.getY() - downY) < 24) {
+            showKeyboard();
         }
         RtHost.injectTouch(action, e.getX(), e.getY());
         return true;

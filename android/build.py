@@ -92,6 +92,26 @@ def main():
     sdk = Path("D:/SDK/Android")
     bt = best_subdir(sdk / "build-tools", "")
     jar = best_subdir(sdk / "platforms", "android-") / "android.jar"
+    # 编译期 android.jar 修正（2026-11-09 实测定案）：本机 platforms 的
+    # 魔改 jar 缺 android.view.InputConnection（API 36+ 已迁
+    # android.view.inputmethod）——探针不过则回退工具目录的
+    # robolectric android-all（完整 AOSP 框架类，Maven Central 单文件）；
+    # 本地缺失时自动下载一次并缓存。
+    try:
+        import zipfile as _zf
+        with _zf.ZipFile(jar) as _z:
+            if "android/view/InputConnection.class" not in _z.namelist():
+                raise KeyError
+    except Exception:
+        tools_jar = ANDROID / "tools" / "compile_android.jar"
+        tools_jar.parent.mkdir(parents=True, exist_ok=True)
+        if not tools_jar.is_file():
+            url = ("https://repo1.maven.org/maven2/org/robolectric/android-all/"
+                   "17-robolectric-16653203/android-all-17-robolectric-16653203.jar")
+            print("[jar] 平台 jar 缺 InputConnection——下载 robolectric android-all 兜底")
+            import urllib.request
+            urllib.request.urlretrieve(url, tools_jar)
+        jar = tools_jar
     ndk = best_subdir(sdk / "ndk", "")
     ndk_bin = ndk / "toolchains" / "llvm" / "prebuilt" / "windows-x86_64" / "bin"
 
@@ -222,7 +242,7 @@ def main():
         sp.parent.mkdir(parents=True, exist_ok=True)
         sp.write_text(s.read_text(encoding="utf-8"), encoding="utf-8")
         staged.append(str(sp))
-    sh(["javac", "--release", "11", "-classpath", str(jar), "-d", str(obj), *staged])
+    sh(["javac", "-encoding", "UTF-8", "--release", "11", "-classpath", str(jar), "-d", str(obj), *staged])
     print("=== 4b/6 d8 ===")
     dex_dir = WORK / "dex"
     if dex_dir.is_dir():

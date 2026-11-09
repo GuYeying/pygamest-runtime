@@ -46,6 +46,10 @@ public final class RtHost {
     /** 触摸注入：action 0=down / 1=move / 2=up（引擎自定义编码） */
     public static native void injectTouch(int action, float x, float y);
 
+    /** IME 提交文本注入（TextInput 事件链——TextInputSurfaceView 的
+     *  InputConnection.commitText 转发） */
+    public static native void injectText(String text);
+
     /** 请求停止当前运行（帧边界收口） */
     public static native void stop();
 }
