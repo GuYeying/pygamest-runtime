@@ -53,6 +53,10 @@ public final class RtHost {
     /** IME 退格注入（deleteSurroundingText 转发——Backspace 事件） */
     public static native void injectBackspace();
 
+    /** 文本输入活跃标志（隐式 egui wants_keyboard 状态——onTouchEvent
+     *  轮询读；egui-starfish-we 桥层自动驱动，非 egui 脚本恒 false） */
+    public static native boolean isTextInputWanted();
+
     /** 请求停止当前运行（帧边界收口） */
     public static native void stop();
 

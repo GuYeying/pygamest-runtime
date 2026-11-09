@@ -52,7 +52,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(0xFF000000);
-        sv = new TextInputSurfaceView(this, RtHost::injectText);
+        sv = new TextInputSurfaceView(this, new TextInputSurfaceView.TextSink() {
+            @Override public void onText(String text) { RtHost.injectText(text); }
+            @Override public void onDelete() { RtHost.injectBackspace(); }
+        });
         sv.getHolder().addCallback(this);
         root.addView(sv, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -160,20 +163,69 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         else if (a == MotionEvent.ACTION_MOVE) action = 1;
         else if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) action = 2;
         else return false;
-        // 点按弹出文本输入对话框（原生 EditText——完整 IME 能力：
-        // 删除/粘贴/中文/选区；确定后 injectText 回投脚本层）
         if (a == MotionEvent.ACTION_DOWN) {
             downX = e.getX(); downY = e.getY();
             downAt = android.os.SystemClock.uptimeMillis();
         }
-        if (a == MotionEvent.ACTION_UP
+        final boolean tap = a == MotionEvent.ACTION_UP
                 && android.os.SystemClock.uptimeMillis() - downAt < 250
                 && Math.abs(e.getX() - downX) < 24
-                && Math.abs(e.getY() - downY) < 24) {
-            showTextDialog();
-        }
+                && Math.abs(e.getY() - downY) < 24;
         RtHost.injectTouch(action, e.getX(), e.getY());
+        // 隐式文本输入轮询（egui wants_keyboard 状态 → 软键盘自动跟；
+        // egui-starfish-we 桥层驱动标志，本层只读）
+        boolean wanted = RtHost.isTextInputWanted();
+        if (wanted != keyboardShown) {
+            if (wanted) showKeyboard();
+            else hideKeyboard();
+            keyboardShown = wanted;
+        }
+        // 点按文本输入对话框（非 egui 脚本的输入通道——原生 EditText
+        // 完整 IME 能力；egui 输入框点按让位隐式链：延迟判定 dodging
+        // 引擎线程异步翻转的竞速）
+        if (tap) {
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (!RtHost.isTextInputWanted() && !keyboardShown) showTextDialog();
+            }, 250);
+        }
         return true;
+    }
+
+    private boolean keyboardShown = false;
+
+    /** 呼出软键盘（served view 焦点前置——requestFocus 后 showSoftInput） */
+    private void showKeyboard() {
+        try {
+            sv.requestFocus();
+            android.view.inputmethod.InputMethodManager imm =
+                    (android.view.inputmethod.InputMethodManager)
+                            getSystemService(INPUT_METHOD_SERVICE);
+            imm.showSoftInput(sv, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+            log("showKeyboard 请求已发");
+            // startInput 未就绪时首调静默失败（焦点/连接竞速）——延迟补一刀
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (RtHost.isTextInputWanted()) {
+                    imm.showSoftInput(sv,
+                            android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+                }
+            }, 120);
+        } catch (Exception e) {
+            log("showKeyboard 失败: " + e);
+        }
+    }
+
+    /** 收起软键盘（clearFocus 归还——下轮弹出干净重挂） */
+    private void hideKeyboard() {
+        try {
+            android.view.inputmethod.InputMethodManager imm =
+                    (android.view.inputmethod.InputMethodManager)
+                            getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(sv.getWindowToken(), 0);
+            sv.clearFocus();
+            log("hideKeyboard 请求已发");
+        } catch (Exception e) {
+            log("hideKeyboard 失败: " + e);
+        }
     }
 
     /** 弹出文本输入对话框（原生 EditText——完整 IME 能力） */

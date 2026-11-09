@@ -74,3 +74,8 @@ ndk-context = "0.1.1"
 # android_main 符号 satisfy 的类型来源（AndroidApp——空实现，JNI 形态
 # 不走 NativeActivity 路径）
 android-activity = "0.6"
+
+# vello_common 0.2.0 strip 光栅化 NaN 防御（vendor 源在 pygamest 仓——
+# 详注见 pygamest Cargo.toml [patch.crates-io]）
+[patch.crates-io]
+vello_common = { path = "../pygame-rs/vendor/vello_common" }

@@ -335,6 +335,20 @@ pub extern "system" fn Java_com_starfish_runtime_RtHost_injectText(
     embedded::inject_text(text);
 }
 
+/// 文本输入活跃标志（隐式 egui wants_keyboard 状态——Java onTouchEvent
+/// 轮询读；egui-starfish-we 桥层自动驱动，桌面 no-op 恒 false）
+#[no_mangle]
+pub extern "system" fn Java_com_starfish_runtime_RtHost_isTextInputWanted(
+    _env: jni_sys::JNIEnv,
+    _clazz: jni_sys::jclass,
+) -> jni_sys::jboolean {
+    if starfish_we::text_input_active() {
+        1
+    } else {
+        0
+    }
+}
+
 #[no_mangle]
 pub extern "system" fn Java_com_starfish_runtime_RtHost_stop(
     _env: jni_sys::JNIEnv,
