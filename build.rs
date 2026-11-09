@@ -26,6 +26,11 @@ fn main() {
     println!("cargo:rerun-if-changed=scripts/pack.toml");
     let res_dir = pack_toml_field("resources", "dir").unwrap_or_else(|| "assets".to_string());
     println!("cargo:rustc-env=RES_DIR_NAME={}", res_dir.rsplit(['/', '\\']).next().unwrap_or("assets"));
+    // Web 资源前缀（pack.toml [wasm] base_url——wasm 导出嵌网站子路径时
+    // 的资源根 URL；空 = 页面相对语义不变）。消费于 runtime 壳 wasm 分支
+    // set_base_dir——游戏资产与 wasm 在网站上的放置位置打包时一次声明。
+    let base_url = pack_toml_field("wasm", "base_url").unwrap_or_default();
+    println!("cargo:rustc-env=WASM_BASE_URL={}", base_url);
 
     // 密钥：pack.toml [build] key_file 相对 [scripts] root（游戏项目根——
     // 每游戏一份）；未命中时回退 crate 根 assets.key（旧布局兼容）

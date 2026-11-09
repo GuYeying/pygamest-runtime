@@ -32,3 +32,7 @@ package = "org.runtime.anim3"
 orientation = "sensorLandscape"
 
 [wasm]
+# 资源前缀（wasm 导出嵌网站子路径时的资源根 URL——如 "games/anim3"；
+# 空 = 页面相对语义。编译期嵌入壳，游戏资产与 wasm 的网站放置位置在此
+# 一次声明；也接受完整 CDN URL）
+base_url = ""

@@ -213,6 +213,15 @@ starfish_std::app_entry!({
             console: Some(starfish_debug::log::Level::Info),
         });
         starfish_debug::log_info!("[runtime] 启动（Web 散文件 + 清单形态）");
+        // Web 资源前缀（编译期 pack.toml [wasm] base_url 嵌入——游戏嵌
+        // 网站子路径时的资源根；空 = 页面相对语义不变。统一时点定约：
+        // base_dir 接线恒在 init_crypto 与 runtime::run 之前）
+        if let Some(prefix) = std::option_env!("WASM_BASE_URL") {
+            if !prefix.is_empty() {
+                starfish_io::set_base_dir(prefix);
+                starfish_debug::log_info!(format!("[runtime] Web 资源前缀 = {prefix}"));
+            }
+        }
         starfish_pygame::sfx::init_crypto(key_from_embedded(), magic_from_embedded());
         let host = GameHost;
         starfish_std::run_control::reset();
