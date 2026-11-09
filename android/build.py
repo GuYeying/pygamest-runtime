@@ -77,6 +77,9 @@ def main():
     ap.add_argument("--skip-build", action="store_true", help="复用现有 .so（调试迭代）")
     ap.add_argument("--install", action="store_true", help="构建后 adb install -r 并启动")
     ap.add_argument("--game", default="hello_word", help="游戏目录名（examples/<game>）")
+    ap.add_argument("--features", default="", help="cargo --features（逗号分隔叠加轴）")
+    ap.add_argument("--no-default-features", action="store_true",
+                    help="剔除默认能力轴（gui/physics/spine/live2d/ozz 全关）")
     args = ap.parse_args()
     game_dir = CRATE / "examples" / args.game
     if not game_dir.is_dir():
@@ -115,8 +118,14 @@ def main():
     so = JNI_LIBS / ABI / SO_NAME
     if not args.skip_build:
         print(f"=== 1/6 cargo ndk build ({ABI}，Java 宿主 cdylib) ===")
-        sh(["cargo", "+nightly", "ndk", "-t", ABI, "-P", "26", "-o", str(JNI_LIBS),
-            "--", "build", "--release", "--example", "runtime_android"], tail=1)
+        cargo_cmd = ["cargo", "+nightly", "ndk", "-t", ABI, "-P", "26",
+                     "-o", str(JNI_LIBS), "--", "build", "--release",
+                     "--example", "runtime_android"]
+        if args.no_default_features:
+            cargo_cmd.append("--no-default-features")
+        if args.features:
+            cargo_cmd += ["--features", args.features]
+        sh(cargo_cmd, tail=1)
     if not so.is_file():
         sys.exit(f"[FAIL] .so 缺失: {so}")
     print("=== 2/6 llvm-strip + JNI 符号自检 ===")

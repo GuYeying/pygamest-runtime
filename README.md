@@ -28,21 +28,48 @@ hello_word/
 ```bash
 git clone https://github.com/GuYeying/pygamest-runtime
 cd pygamest-runtime
-cargo build --release --bin runtime     # 首次构建自动拉取 GitHub 依赖（按 Cargo.lock 锁定版本）
+cargo +nightly build --release --bin runtime     # 首次构建自动拉取 GitHub 依赖（按 Cargo.lock 锁定版本）
 ```
 
 无需手动下载任何依赖仓库——跨仓依赖以 git 形式声明并锁定在 Cargo.lock。
+⚠️ 默认集含 ozz（上游 `std::simd`）——**构建须 nightly 工具链**
+（stable 报 `core::simd` 错属预期）。
+
+## 能力轴（feature 控制剔除）
+
+| feature | 默认 | 说明 |
+|---|---|---|
+| `gui` / `physics2d` / `physics3d` | ✅ | egui 界面 + rapier 2D/3D |
+| `ozz` | ✅ | 3D 骨骼动画（nightly 依赖来源） |
+| `spine` | ✅ | Spine 2D 骨骼动画 |
+| `live2d` | ✅ | Live2D/Cubism |
+| `stdlib-full` | ⬜ | stdlib 全量冻结（缺省 = Lib_min 裁剪版） |
+
+```bash
+cargo +nightly build --release --no-default-features --features "gui,physics2d,physics3d"   # 剔除动画库
+cargo +nightly build --release --no-default-features                                         # 最小形态
+```
+
+三平台打包脚本同款参数：`--features 轴列表`（叠加）与
+`--no-default-features`（全剔除后按 `--features` 精选）。
 
 ## 三平台打包
 
 ```
-python scripts/build_windows.py     # Windows/Linux：dist/<游戏>/
-python scripts/build_wasm.py        # Web：dist/<游戏>-web/（静态服务即跑）
-python android/build.py             # Android：target/apk/<游戏>.apk（NativeActivity 自管理）
+python scripts/build_windows.py --game anim3     # Windows/Linux：dist/<游戏>/
+python scripts/build_wasm.py --game anim3        # Web：dist/<游戏>-web/（静态服务即跑）
+python android/build.py --game anim3             # Android：target/apk/<游戏>.apk（Java 宿主 + JNI 嵌入面——卓易通实测通过）
 ```
 
-配置单一源 `scripts/pack.toml`（游戏名/入口/密钥/资源目录/横竖屏）；
-密钥每游戏一份（`examples/<游戏>/assets.key`，缺失自动生成，**永不入库**）。
+- `--game <名>`：游戏项目 = `examples/<名>/`（main.py 入口 + modules/ +
+  assets/）；`--features "spine,live2d"` 叠加轴；`--no-default-features`
+  剔除默认轴（Android 另有 `--install` 构建后直装）
+- ⚠️ 默认集含 ozz → 脚本内部已固定走 nightly 工具链
+- 配置单一源 `scripts/pack.toml`（游戏名/入口/密钥/资源目录/横竖屏）；
+  密钥每游戏一份（`examples/<游戏>/assets.key`，缺失自动生成，**永不
+  入库**）
+- 测试：桌面双击 exe；Web 在 `dist/<游戏>-web` 起静态服务开 index.html；
+  Android `adb install -r`（崩溃取证 = `/sdcard/Download/dev_log.txt`）
 
 ## 生态仓库矩阵
 
@@ -54,6 +81,17 @@ python android/build.py             # Android：target/apk/<游戏>.apk（Native
 | [pygamest-runtime](https://github.com/GuYeying/pygamest-runtime) | 游戏运行时（本仓，玩家单元） |
 | [egui-starfish-we](https://github.com/GuYeying/egui-starfish-we) | egui × starfish-we 适配（vendored egui-winit fork） |
 | [rapier-starfish-debug](https://github.com/GuYeying/rapier-starfish-debug) | Rapier 物理适配 + 通用 debug 渲染 |
+
+
+
+## 第三方美术资源
+
+示例所用素材取自 LearnOpenGL（作者 Joey de Vries，
+https://learnopengl.com ，许可：Creative Commons Attribution 4.0
+International —— CC BY 4.0）；部分测试素材取自
+[SampleLib](https://samplelib.com/zh/)（网站原创测试文件，允许下载、
+修改与使用，按现状提供不提供担保）。
+
 
 ## 协议
 

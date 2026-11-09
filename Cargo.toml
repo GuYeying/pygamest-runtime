@@ -11,7 +11,7 @@ description = "pygamest 游戏运行时（生产宿主）——入口编译期�
 # 宿主方向 feature 废除定约）；不带 stdlib-full = 裁剪版 stdlib。
 # dev 仓以 default-features = false 消费（只借 Host trait + 驱动，不回灌
 # 它的默认全量轴——feature 并集从此可控）
-pygamest = { git = "https://github.com/GuYeying/pygamest", default-features = false, features = ["gui", "physics2d", "physics3d", "spine", "live2d", "ozz"] }
+pygamest = { git = "https://github.com/GuYeying/pygamest", default-features = false }
 pygamest-dev = { git = "https://github.com/GuYeying/pygamest-dev", default-features = false }
 starfish-pygame = { git = "https://github.com/GuYeying/starfish" }
 starfish-io = { git = "https://github.com/GuYeying/starfish" }
@@ -26,6 +26,16 @@ chacha20poly1305 = { version = "0.10", default-features = false, features = ["al
 chacha20poly1305 = { version = "0.10", default-features = false, features = ["alloc"] }
 
 [features]
+# 能力轴透传（对齐 pygamest 同名轴）：default = 全量形态；剔除 =
+# --no-default-features 或按需组合（打包脚本 --features 透传）。
+# ⚠️ ozz 入 default → 构建须 nightly 工具链（上游 std::simd）。
+default = ["gui", "physics2d", "physics3d", "spine", "live2d", "ozz"]
+gui = ["pygamest/gui"]
+physics2d = ["pygamest/physics2d"]
+physics3d = ["pygamest/physics3d"]
+spine = ["pygamest/spine"]
+live2d = ["pygamest/live2d"]
+ozz = ["pygamest/ozz"]
 # 全量标准库（开发/调试用——生产导出缺省不含）
 stdlib-full = ["pygamest/stdlib-full"]
 

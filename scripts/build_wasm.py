@@ -3,7 +3,7 @@
 """build_wasm.py——pygamest-runtime Web 构建（多文件明文形态，v1 定约）。
 
 用法：
-  python scripts/build_wasm.py [--game hello_word]
+  python scripts/build_wasm.py [--game hello_word] [--features 轴列表] [--no-default-features]
 
 流程：
   1. wasm-bindgen-cli 版本自检（与 Cargo.lock 严格一致）
@@ -174,17 +174,26 @@ def deploy_game(out: Path, game_dir: Path, kf: Path, magic: bytes):
     print(f"[OK] payload 加密：模块 {n_mod} + 资源 {n_res} + 加密清单（入口已嵌入 wasm）")
 
 
+def _argv_value(flag: str, default: str = "") -> str:
+    return sys.argv[sys.argv.index(flag) + 1] if flag in sys.argv else default
+
+
 def main():
-    game = "hello_word"
-    if "--game" in sys.argv:
-        game = sys.argv[sys.argv.index("--game") + 1]
+    game = _argv_value("--game", "hello_word")
+    features = _argv_value("--features")
+    no_default = "--no-default-features" in sys.argv
     game_dir = CRATE / "examples" / game
     out = CRATE / "dist" / f"{game}-web"
 
     check_bindgen_version()
     print("=== 构建 wasm runtime（bin runtime）===")
-    sh(["cargo", "+nightly", "build", "--release", "--target", "wasm32-unknown-unknown",
-        "--bin", "runtime"], tail=1)
+    cargo_cmd = ["cargo", "+nightly", "build", "--release", "--target",
+                 "wasm32-unknown-unknown", "--bin", "runtime"]
+    if no_default:
+        cargo_cmd.append("--no-default-features")
+    if features:
+        cargo_cmd += ["--features", features]
+    sh(cargo_cmd, tail=1)
     wasm = TARGET_DIR / "runtime.wasm"
     if not wasm.is_file():
         sys.exit(f"[FAIL] wasm 产物缺失: {wasm}")

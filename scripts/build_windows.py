@@ -2,6 +2,7 @@
 """build_windows.py——桌面导出（系统 CPython 上跑，零引擎依赖）：
 
   python scripts/build_windows.py [--config pack.toml] [--target linux]
+                                    [--features 轴列表] [--no-default-features]
 
 分工（打包规范唯一实现 = bundle.py，本脚本只编排）：
   资源 → bundle.py → dist/<name>/<资源目录>/ 哈希名 .sfx 散文件
@@ -29,11 +30,17 @@ def main():
     crate_root = os.path.dirname(script_dir)
     config_path = os.path.join(script_dir, "pack.toml")
     target = "windows"
+    features = ""
+    no_default = False
     for i, a in enumerate(sys.argv):
         if a == "--config":
             config_path = sys.argv[i + 1]
         if a == "--target":
             target = sys.argv[i + 1]
+        if a == "--features":
+            features = sys.argv[i + 1]
+        if a == "--no-default-features":
+            no_default = True
 
     cfg = get_target(load(config_path), target)
     name = cfg.get("name", "game")
@@ -83,7 +90,12 @@ def main():
     plat_name = "Windows" if exe_suffix else "Linux"
     print(f"=== [{name}] {plat_name} 构建（散文件 + 清单形态） ===")
     print("[1/5] cargo build --bin runtime")
-    subprocess.run(["cargo", "+nightly", "build", "--release", "--bin", "runtime"],
+    cargo_cmd = ["cargo", "+nightly", "build", "--release", "--bin", "runtime"]
+    if no_default:
+        cargo_cmd.append("--no-default-features")
+    if features:
+        cargo_cmd += ["--features", features]
+    subprocess.run(cargo_cmd,
                    check=True, cwd=crate_root)
     runtime_exe = os.path.join(crate_root, "target", "release", "runtime" + exe_suffix)
 
