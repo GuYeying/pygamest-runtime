@@ -20,3 +20,4 @@ android/jniLibs/
 .cargo/config.toml
 .cargo/
 android/tools/
+examples/*/assets/video/*.mp4
