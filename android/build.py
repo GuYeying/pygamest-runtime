@@ -65,6 +65,10 @@ def sh(cmd, cwd=None, tail=0):
     return out
 
 
+# 视频明文豁免扩展（bundle --plain-ext；详注见 cmd_pack 段）
+VIDEO_PLAIN_EXTS = ("mp4", "webm", "mkv", "mov", "m4v", "avi")
+
+
 def best_subdir(base: Path, prefix: str) -> Path:
     cands = [p for p in base.glob(f"{prefix}*") if p.is_dir()] if base.is_dir() else []
     if not cands:
@@ -184,6 +188,11 @@ def main():
                   "--magic", magic.decode()]
     for g in ignore_globs:
         bundle_cmd += ["--ignore", g]
+    # 视频明文豁免（2026-11-10 定约方案 A）：大媒体原路径原样——原生
+    # 解码器（MediaCodec）要 seekable 明文文件；加密全量解密喂解码不
+    # 合理。与 sfx 同一 base_dir（filesDir）——io::resolve 统一解析
+    for ext in VIDEO_PLAIN_EXTS:
+        bundle_cmd += ["--plain-ext", ext]
     subprocess.run(bundle_cmd, check=True, cwd=CRATE)
 
     # 3b) 脚本（游戏全量 .py，剔资源子树——资源子树内 .py 属热更走资源
@@ -216,6 +225,10 @@ def main():
         rel = f.relative_to(game_dir).as_posix()
         if any(fnmatch.fnmatch(rel, g) or fnmatch.fnmatch(f.name, g)
                for g in ignore_globs):
+            continue
+        # 明文豁免文件不入预载表（sfx::read 解密读对明文必败——视频由
+        # 解码器直开）；_manifest 展开表仍收录（裸复制到 filesDir 原路径）
+        if f.suffix.lower().lstrip(".") in VIDEO_PLAIN_EXTS:
             continue
         payload.append(rel)
 

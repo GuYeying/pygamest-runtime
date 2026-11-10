@@ -19,6 +19,7 @@ import argparse
 import fnmatch
 import hashlib
 import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -75,12 +76,23 @@ def cmd_pack(args) -> int:
     if len(magic) != 5:
         sys.exit("[FAIL] --magic 须为 5 字符")
     aead = ChaCha20Poly1305(key)
+    # 明文豁免扩展（--plain-ext，如 mp4）：原路径原样拷贝、零加密零哈希
+    # 名——大媒体资产直供原生解码器（MF/MediaCodec 要 seekable 文件路径；
+    # 全量解密喂解码器对大视频不合理，2026-11-10 用户定约方案 A）
+    plain_exts = tuple(e.lower().lstrip(".") for e in (args.plain_ext or []))
 
     out.mkdir(parents=True)
-    n = total = skipped = 0
+    n = total = skipped = plain_n = 0
     for f in walk(src, args.ignore):
         rel = f.relative_to(src).as_posix()
         logical = f"{args.prefix}/{rel}" if args.prefix else rel
+        if plain_exts and f.suffix.lower().lstrip(".") in plain_exts:
+            dst = out / Path(logical)
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, dst)
+            plain_n += 1
+            print(f"  {logical} → {dst.relative_to(out).as_posix()}（明文豁免）")
+            continue
         data = f.read_bytes()
         nonce = os.urandom(12)
         env = magic + nonce + aead.encrypt(nonce, data, DOMAIN_AAD)
@@ -97,7 +109,9 @@ def cmd_pack(args) -> int:
                       if ignored(os.path.relpath(os.path.join(root, f), src).replace(os.sep, "/"), args.ignore))
         if skipped:
             print(f"  （--ignore 剔除 {skipped} 个）")
-    print(f"[DONE] {out}（{n} 个 .sfx，{total // 1024}KB）——目录结构保留、叶子哈希名")
+    print(f"[DONE] {out}（{n} 个 .sfx，{total // 1024}KB"
+          + (f"，{plain_n} 个明文豁免" if plain_n else "")
+          + "）——目录结构保留、叶子哈希名")
     return 0
 
 
@@ -111,6 +125,8 @@ def main() -> int:
     p.add_argument("--key", required=True, help="64 位 hex，或 @密钥文件路径")
     p.add_argument("--prefix", default="", help="逻辑路径前缀（如 assets——游戏加载路径相对游戏根时用）")
     p.add_argument("--magic", default="SFXE1", help="封装魔数（5 字符）")
+    p.add_argument("--plain-ext", action="append", default=[],
+                   help="明文豁免扩展（如 mp4——原路径原样拷贝零加密，大媒体直供原生解码器）")
     p.add_argument("--ignore", action="append", default=[],
                    help="剔除 glob（相对 src 的 POSIX 路径或文件名；可多次）")
     p.set_defaults(fn=cmd_pack)

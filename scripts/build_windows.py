@@ -112,6 +112,9 @@ def main():
                   "--magic", magic.decode()]
     for g in ignore_globs:
         bundle_cmd += ["--ignore", g]
+    # 视频明文豁免（与 android/build.py 同款——详注见 bundle.py cmd_pack）
+    for ext in ("mp4", "webm", "mkv", "mov", "m4v", "avi"):
+        bundle_cmd += ["--plain-ext", ext]
     subprocess.run(bundle_cmd, check=True)
 
     # ── 3) 脚本收集 → 加密 → **哈希名 .sfx**（资源子树剔除——里面的 .py

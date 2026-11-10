@@ -153,8 +153,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private float downX, downY;
     private long downAt;
 
-
-
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         int a = e.getActionMasked();
@@ -163,30 +161,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         else if (a == MotionEvent.ACTION_MOVE) action = 1;
         else if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) action = 2;
         else return false;
-        if (a == MotionEvent.ACTION_DOWN) {
-            downX = e.getX(); downY = e.getY();
-            downAt = android.os.SystemClock.uptimeMillis();
-        }
-        final boolean tap = a == MotionEvent.ACTION_UP
-                && android.os.SystemClock.uptimeMillis() - downAt < 250
-                && Math.abs(e.getX() - downX) < 24
-                && Math.abs(e.getY() - downY) < 24;
         RtHost.injectTouch(action, e.getX(), e.getY());
         // 隐式文本输入轮询（egui wants_keyboard 状态 → 软键盘自动跟；
-        // egui-starfish-we 桥层驱动标志，本层只读）
+        // egui-starfish-we 桥层驱动标志，本层只读）。输入行为与 dev 宿主
+        // 完全一致（用户定约 2026-11-10）：不弹原生对话框——非 egui 脚本
+        // 的文本输入走 pygame.key.start_text_input 显式口
         boolean wanted = RtHost.isTextInputWanted();
         if (wanted != keyboardShown) {
             if (wanted) showKeyboard();
             else hideKeyboard();
             keyboardShown = wanted;
-        }
-        // 点按文本输入对话框（非 egui 脚本的输入通道——原生 EditText
-        // 完整 IME 能力；egui 输入框点按让位隐式链：延迟判定 dodging
-        // 引擎线程异步翻转的竞速）
-        if (tap) {
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                if (!RtHost.isTextInputWanted() && !keyboardShown) showTextDialog();
-            }, 250);
         }
         return true;
     }
@@ -226,25 +210,5 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         } catch (Exception e) {
             log("hideKeyboard 失败: " + e);
         }
-    }
-
-    /** 弹出文本输入对话框（原生 EditText——完整 IME 能力） */
-    private void showTextDialog() {
-        runOnUiThread(() -> {
-            try {
-                android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(this);
-                final android.widget.EditText et = new android.widget.EditText(this);
-                et.setText("");
-                b.setTitle("文本输入").setView(et)
-                 .setPositiveButton("确定", (d, w) -> {
-                     String text = et.getText().toString();
-                     if (!text.isEmpty()) RtHost.injectText(text);
-                 })
-                 .setNegativeButton("取消", null)
-                 .show();
-            } catch (Exception e) {
-                android.util.Log.e("RtActivity", "showTextDialog", e);
-            }
-        });
     }
 }
