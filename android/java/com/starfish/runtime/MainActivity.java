@@ -39,7 +39,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             if (prev != null) prev.uncaughtException(t, e);
         });
 
-        RtHost.initContext(getApplicationContext());
+        // 传 Activity 本体（robius dialog 走 runOnUiThread 需要真
+        // Activity 的 UI Handler——app Context 无 UI Handler = NPE）
+        RtHost.initContext(this);
         log("onCreate ndk-context 已绑定");
 
         // 全屏沉浸

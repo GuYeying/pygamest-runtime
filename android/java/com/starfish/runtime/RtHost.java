@@ -57,6 +57,7 @@ public final class RtHost {
      *  轮询读；egui-starfish-we 桥层自动驱动，非 egui 脚本恒 false） */
     public static native boolean isTextInputWanted();
 
+
     /** 请求停止当前运行（帧边界收口） */
     public static native void stop();
 

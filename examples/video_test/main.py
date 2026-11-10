@@ -50,8 +50,10 @@ async def main():
     except ValueError:
         check("missing open raises", True)
 
-    v = vs.open("assets/video/bbb_10s.mp4")
-    check("open", v is not None)
+    # 异步面（2026-11-10 定约主形态）：open 后台线程 + 帧轮询——主循
+    # 环不卡（VideoSystem.open 同步口保留作底层/兼容）
+    v = await pygame.video.open("assets/video/bbb_10s.mp4")
+    check("await open", v is not None)
     # size 惰性（首帧解码前 = (0,0)——打开即查不是契约）
     check("size 首帧前惰性 0", v.size() == (0, 0), f"size={v.size()}")
 

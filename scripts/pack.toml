@@ -17,7 +17,7 @@ out = "dist"
 ignore = ["*.log"]
 
 [scripts]
-root = "examples/anim3"
+root = "examples/dialog_probe"
 
 [resources]
 # dir 末段目录名 = 发行资源目录名（build.rs 解析同名值 → RES_DIR_NAME 编译进壳）
