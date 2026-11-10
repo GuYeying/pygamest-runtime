@@ -28,7 +28,19 @@ def main():
         "wasm": [sys.executable, os.path.join(script_dir, "build_wasm.py")],
         "android": [sys.executable, os.path.join(crate_root, "android", "build.py"), "demo"],
     }
+    # 多平台扩展位（阶段六预留——适配层就绪即补 builder，见
+    # pygamest reference/多平台扩展性架构分析与整改（阶段六）.md）：
+    #   macos = .app bundle（starfish-we AppKit 后端 + video VideoToolbox
+    #           后端已实装；打包脚本待建——codesign/Info.plist）
+    #   ios   = .ipa（UIKit 后端 + Xcode 工程模板待建）
+    #   ohos  = .hap（XComponent 适配层 + wgpu GL/EGL + OHAudio/AVPlayer
+    #           待建——全部引擎侧扩展位已留，见报告 §Gap 表）
+    reserved = {"macos", "ios", "ohos"}
     for t in targets:
+        if t in reserved:
+            print(f"[预留] {t} 打包适配层待建（引擎侧平台后端已就位——"
+                  f"补 build_{t}.py 后在本表登记即可，架构零阻碍）")
+            continue
         builder = builders.get(t)
         if not builder or not os.path.isfile(builder[1]) or (
                 t == "linux" and not os.path.isfile(builder[2])):
