@@ -1240,9 +1240,9 @@ dependencies = [
  "profiling",
  "raw-window-handle",
  "smithay-clipboard",
- "starfish-render 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-std 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-time 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-render 0.9.64",
+ "starfish-std 0.9.64",
+ "starfish-time 0.9.64",
  "starfish-we",
  "web-time",
  "webbrowser",
@@ -4269,7 +4269,7 @@ dependencies = [
 
 [[package]]
 name = "pygamest"
-version = "0.3.65"
+version = "0.3.66"
 dependencies = [
  "chacha20poly1305",
  "egui-starfish-we",
@@ -4283,19 +4283,19 @@ dependencies = [
  "rustpython-derive",
  "rustpython-pylib",
  "rustpython-vm",
- "starfish-audio 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-font 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-gamepad 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-gfx 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-io 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-net 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-permission 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-audio 0.9.64",
+ "starfish-debug 0.9.64",
+ "starfish-font 0.9.64",
+ "starfish-gamepad 0.9.64",
+ "starfish-gfx 0.9.64",
+ "starfish-io 0.9.64",
+ "starfish-net 0.9.64",
+ "starfish-permission 0.9.64",
  "starfish-pygame",
- "starfish-render 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-std 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-time 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-video 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-render 0.9.64",
+ "starfish-std 0.9.64",
+ "starfish-time 0.9.64",
+ "starfish-video 0.9.64",
  "starfish-we",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -4304,17 +4304,17 @@ dependencies = [
 
 [[package]]
 name = "pygamest-dev"
-version = "0.1.11"
+version = "0.1.12"
 dependencies = [
  "android-activity",
  "jni-sys 0.3.1",
  "ndk-context",
  "pygamest",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-dialog 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-io 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-debug 0.9.64",
+ "starfish-dialog 0.9.64",
+ "starfish-io 0.9.64",
  "starfish-pygame",
- "starfish-std 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-std 0.9.64",
  "starfish-we",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -4324,7 +4324,7 @@ dependencies = [
 
 [[package]]
 name = "pygamest-runtime"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "android-activity",
  "chacha20poly1305",
@@ -4332,10 +4332,10 @@ dependencies = [
  "ndk-context",
  "pygamest",
  "pygamest-dev",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-io 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-debug 0.9.64",
+ "starfish-io 0.9.64",
  "starfish-pygame",
- "starfish-std 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-std 0.9.64",
  "starfish-we",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -4519,10 +4519,10 @@ dependencies = [
  "glam 0.33.11",
  "rapier2d",
  "rapier3d",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-gfx 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-render 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-std 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-debug 0.9.64",
+ "starfish-gfx 0.9.64",
+ "starfish-render 0.9.64",
+ "starfish-std 0.9.64",
  "wgpu",
 ]
 
@@ -5665,6 +5665,7 @@ dependencies = [
 [[package]]
 name = "starfish-audio"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "bytemuck",
  "cpal",
@@ -5681,16 +5682,15 @@ dependencies = [
 
 [[package]]
 name = "starfish-audio"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "bytemuck",
  "cpal",
  "log",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-dialog 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-io 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-permission 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-debug 0.9.65",
+ "starfish-dialog 0.9.65",
+ "starfish-io 0.9.65",
+ "starfish-permission 0.9.65",
  "symphonia",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -5700,6 +5700,7 @@ dependencies = [
 [[package]]
 name = "starfish-debug"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "log",
  "wasm-bindgen",
@@ -5708,8 +5709,7 @@ dependencies = [
 
 [[package]]
 name = "starfish-debug"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "log",
  "wasm-bindgen",
@@ -5719,6 +5719,7 @@ dependencies = [
 [[package]]
 name = "starfish-dialog"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "jni 0.21.1",
  "js-sys",
@@ -5735,8 +5736,7 @@ dependencies = [
 
 [[package]]
 name = "starfish-dialog"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "jni 0.21.1",
  "js-sys",
@@ -5744,8 +5744,8 @@ dependencies = [
  "rfd 0.15.4",
  "robius-android-env",
  "robius-file-picker",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-permission 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-debug 0.9.65",
+ "starfish-permission 0.9.65",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -5754,6 +5754,7 @@ dependencies = [
 [[package]]
 name = "starfish-font"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
@@ -5765,13 +5766,12 @@ dependencies = [
 
 [[package]]
 name = "starfish-font"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
  "image",
- "starfish-render 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-render 0.9.65",
  "ttf-parser",
  "wgpu",
 ]
@@ -5779,6 +5779,7 @@ dependencies = [
 [[package]]
 name = "starfish-gamepad"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "gilrs",
  "js-sys",
@@ -5788,8 +5789,7 @@ dependencies = [
 
 [[package]]
 name = "starfish-gamepad"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "gilrs",
  "js-sys",
@@ -5800,6 +5800,7 @@ dependencies = [
 [[package]]
 name = "starfish-gfx"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
@@ -5809,18 +5810,18 @@ dependencies = [
 
 [[package]]
 name = "starfish-gfx"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
- "starfish-render 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-render 0.9.65",
  "wgpu",
 ]
 
 [[package]]
 name = "starfish-io"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "js-sys",
  "ndk",
@@ -5833,8 +5834,7 @@ dependencies = [
 
 [[package]]
 name = "starfish-io"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "js-sys",
  "ndk",
@@ -5848,6 +5848,7 @@ dependencies = [
 [[package]]
 name = "starfish-net"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "js-sys",
  "starfish-debug 0.9.64",
@@ -5858,12 +5859,11 @@ dependencies = [
 
 [[package]]
 name = "starfish-net"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "js-sys",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-permission 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-debug 0.9.65",
+ "starfish-permission 0.9.65",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -5871,6 +5871,7 @@ dependencies = [
 [[package]]
 name = "starfish-permission"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "jni 0.21.1",
  "js-sys",
@@ -5885,15 +5886,14 @@ dependencies = [
 
 [[package]]
 name = "starfish-permission"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "jni 0.21.1",
  "js-sys",
  "ndk-context",
  "robius-android-env",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-std 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-debug 0.9.65",
+ "starfish-std 0.9.65",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -5901,7 +5901,7 @@ dependencies = [
 
 [[package]]
 name = "starfish-pygame"
-version = "0.9.64"
+version = "0.9.65"
 dependencies = [
  "bytemuck",
  "chacha20poly1305",
@@ -5914,19 +5914,19 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "starfish-audio 0.9.64",
- "starfish-debug 0.9.64",
- "starfish-dialog 0.9.64",
- "starfish-font 0.9.64",
- "starfish-gamepad 0.9.64",
- "starfish-gfx 0.9.64",
- "starfish-io 0.9.64",
- "starfish-net 0.9.64",
- "starfish-permission 0.9.64",
- "starfish-render 0.9.64",
- "starfish-std 0.9.64",
- "starfish-time 0.9.64",
- "starfish-video 0.9.64",
+ "starfish-audio 0.9.65",
+ "starfish-debug 0.9.65",
+ "starfish-dialog 0.9.65",
+ "starfish-font 0.9.65",
+ "starfish-gamepad 0.9.65",
+ "starfish-gfx 0.9.65",
+ "starfish-io 0.9.65",
+ "starfish-net 0.9.65",
+ "starfish-permission 0.9.65",
+ "starfish-render 0.9.65",
+ "starfish-std 0.9.65",
+ "starfish-time 0.9.65",
+ "starfish-video 0.9.65",
  "starfish-we",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -5937,6 +5937,7 @@ dependencies = [
 [[package]]
 name = "starfish-render"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
@@ -5953,16 +5954,15 @@ dependencies = [
 
 [[package]]
 name = "starfish-render"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
  "image",
  "pollster",
  "raw-window-handle",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-std 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-debug 0.9.65",
+ "starfish-std 0.9.65",
  "starfish-we",
  "thiserror 2.0.21",
  "web-sys",
@@ -5972,38 +5972,38 @@ dependencies = [
 [[package]]
 name = "starfish-std"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "console_error_panic_hook",
  "pollster",
  "starfish-debug 0.9.64",
- "wasm-bindgen",
- "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "starfish-std"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
-dependencies = [
- "console_error_panic_hook",
- "pollster",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
  "starfish-we",
  "wasm-bindgen",
  "wasm-bindgen-futures",
 ]
 
 [[package]]
+name = "starfish-std"
+version = "0.9.65"
+dependencies = [
+ "console_error_panic_hook",
+ "pollster",
+ "starfish-debug 0.9.65",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+]
+
+[[package]]
 name = "starfish-time"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "web-sys",
 ]
 
 [[package]]
 name = "starfish-time"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "web-sys",
 ]
@@ -6011,6 +6011,7 @@ dependencies = [
 [[package]]
 name = "starfish-video"
 version = "0.9.64"
+source = "git+https://github.com/GuYeying/starfish#10ac720cf9c2493e639a3350996b9053995b9222"
 dependencies = [
  "gstreamer",
  "gstreamer-app",
@@ -6039,8 +6040,7 @@ dependencies = [
 
 [[package]]
 name = "starfish-video"
-version = "0.9.64"
-source = "git+https://github.com/GuYeying/starfish#2fb1c1e0e7ed95a9a76d5e3c4141f877441abe08"
+version = "0.9.65"
 dependencies = [
  "gstreamer",
  "gstreamer-app",
@@ -6056,9 +6056,9 @@ dependencies = [
  "objc2-core-video",
  "objc2-foundation",
  "objc2-video-toolbox",
- "starfish-audio 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-debug 0.9.64 (git+https://github.com/GuYeying/starfish)",
- "starfish-std 0.9.64 (git+https://github.com/GuYeying/starfish)",
+ "starfish-audio 0.9.65",
+ "starfish-debug 0.9.65",
+ "starfish-std 0.9.65",
  "symphonia",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -6069,7 +6069,7 @@ dependencies = [
 
 [[package]]
 name = "starfish-we"
-version = "0.9.64"
+version = "0.9.65"
 dependencies = [
  "android-activity",
  "js-sys",
@@ -6084,8 +6084,8 @@ dependencies = [
  "raw-window-handle",
  "sctk-adwaita",
  "smithay-client-toolkit 0.21.1",
- "starfish-debug 0.9.64",
- "starfish-io 0.9.64",
+ "starfish-debug 0.9.65",
+ "starfish-io 0.9.65",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wayland-client",
