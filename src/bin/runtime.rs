@@ -95,6 +95,20 @@ impl Host for GameHost {
             .collect();
         starfish_debug::log_info!(format!("[runtime] 载荷清单 {} 个", payload.len()));
 
+        // CJK 字体资产预载（egui 面板中文——egui 无内建默认字体，不带
+        // assets/fonts/cjk.ttf 时 egui 文本全灭变方块）。miss 仅记日志
+        // （纯英文 egui 游戏可不带）
+        match starfish_pygame::sfx::read(&format!("{}/fonts/cjk.ttf", env!("RES_DIR_NAME"))).await
+        {
+            Ok(b) => {
+                starfish_pygame::font::preload("cjk", b);
+                starfish_debug::log_info!("[runtime] CJK 字体已预载（assets/fonts/cjk.ttf）");
+            }
+            Err(_) => {
+                starfish_debug::log_info!("[runtime] CJK 字体资产未携带（egui 中文将缺字）");
+            }
+        }
+
         // 其余 .py 全量读 + 装表（游戏 `import` 即命中——查表缓存定约）。
         // 资源目录前缀下的 .py 属**热更资源**（.sfx 哈希链，游戏按需
         // fetch——不入装表，否则内嵌版会压住热更版本）
