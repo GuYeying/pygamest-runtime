@@ -44,6 +44,10 @@ INDEX_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
+<!-- viewport（2026-11-14 手机实测定案）：无此 meta 手机浏览器按 980px
+     布局视口渲染再缩放——canvas css 尺寸异常 = egui UI 比例异常 +
+     input 聚焦缩放的总根源。user-scalable=no 同封聚焦缩放/双击缩放 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>pygamest-runtime</title>
 <style>
   html, body { margin: 0; height: 100%; background: #000; color: #ccc;
