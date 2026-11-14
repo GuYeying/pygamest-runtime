@@ -199,7 +199,7 @@ dependencies = [
  "objc2-foundation",
  "parking_lot",
  "percent-encoding",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
  "x11rb",
 ]
 
@@ -1225,7 +1225,7 @@ dependencies = [
 [[package]]
 name = "egui-starfish-we"
 version = "0.1.3"
-source = "git+https://github.com/GuYeying/egui-starfish-we#5a4d51975106c9ccf214021b7dfbb8f90cf88fc8"
+source = "git+https://github.com/GuYeying/egui-starfish-we#15e1d4774ff767f5e962474a76324adb59ceae5e"
 dependencies = [
  "arboard",
  "block2",
@@ -1396,7 +1396,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1758,7 +1758,7 @@ dependencies = [
  "gobject-sys",
  "libc",
  "system-deps",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4959,7 +4959,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5665,8 +5665,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-audio"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "bytemuck",
  "cpal",
@@ -5683,8 +5683,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-debug"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "log",
  "wasm-bindgen",
@@ -5693,8 +5693,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-dialog"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "jni 0.21.1",
  "js-sys",
@@ -5711,8 +5711,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-font"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
@@ -5724,8 +5724,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-gamepad"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "gilrs",
  "js-sys",
@@ -5735,8 +5735,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-gfx"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
@@ -5746,8 +5746,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-io"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "js-sys",
  "ndk",
@@ -5760,8 +5760,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-net"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "js-sys",
  "starfish-debug",
@@ -5772,8 +5772,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-permission"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "jni 0.21.1",
  "js-sys",
@@ -5788,8 +5788,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-pygame"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "bytemuck",
  "chacha20poly1305",
@@ -5824,8 +5824,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-render"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "bytemuck",
  "glam 0.33.11",
@@ -5842,8 +5842,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-std"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "console_error_panic_hook",
  "pollster",
@@ -5855,16 +5855,16 @@ dependencies = [
 
 [[package]]
 name = "starfish-time"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "web-sys",
 ]
 
 [[package]]
 name = "starfish-video"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "gstreamer",
  "gstreamer-app",
@@ -5893,8 +5893,8 @@ dependencies = [
 
 [[package]]
 name = "starfish-we"
-version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
+version = "0.9.74"
+source = "git+https://github.com/GuYeying/starfish#270c53d9710805cd9450c1f35c4c108edbdc7eb5"
 dependencies = [
  "android-activity",
  "jni-sys 0.3.1",
@@ -6171,7 +6171,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -7117,7 +7117,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

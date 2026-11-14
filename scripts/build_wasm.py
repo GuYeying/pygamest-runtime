@@ -65,6 +65,7 @@ INDEX_TEMPLATE = r"""<!DOCTYPE html>
 <pre id="wlog"></pre>
 <script>
 const _wl = document.getElementById('wlog');
+_wl.textContent += '[build] ' + '__BUILD_TS__' + '\n';
 const _fmt = a => a.map(x => { try {
   return (x && x.message !== undefined) ? x.message : String(x);
 } catch (e) { return '<unprintable>'; } }).join(' ');
