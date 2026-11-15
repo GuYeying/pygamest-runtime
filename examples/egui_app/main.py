@@ -23,9 +23,6 @@ class HUD(egui.UiBase):
         self.mode = 1            # 起始：横屏比例
         self.want = -1           # >=0 = 主循环应用
         self.info = ""
-        self.name = "玩家"
-        self.scales = [0.0, 1.5, 2.0, 3.0]  # 0 = 自动（init 的 物理/逻辑）
-        self.scale_idx = 0
         
     def draw(self, ui):
         ui.heading("显示模式（单选）")
@@ -36,17 +33,6 @@ class HUD(egui.UiBase):
                 self.mode = i
         ui.separator()
         ui.label(self.info)
-        # UI 缩放档位（手机视觉自调——set_scale 即时生效，ppp 实测显示）
-        tag = "自动" if self.scale_idx == 0 else f"×{self.scales[self.scale_idx]:g}"
-        if ui.button(f"UI 缩放 {tag}"):
-            self.scale_idx = (self.scale_idx + 1) % len(self.scales)
-            v = self.scales[self.scale_idx]
-            if v > 0:
-                egui.set_scale(v)
-            else:
-                egui.set_scale(1.0)  # 自动基准（init 的 物理/逻辑）
-        ui.label(f"当前 ppp≈{self.scales[self.scale_idx] if self.scale_idx else 1.0:g}")
-        self.name = ui.text_edit(self.name)
 
 
 async def main():
