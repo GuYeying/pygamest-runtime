@@ -24,6 +24,8 @@ class HUD(egui.UiBase):
         self.want = -1           # >=0 = 主循环应用
         self.info = ""
         self.name = "玩家"
+        self.scales = [0.0, 1.5, 2.0, 3.0]  # 0 = 自动（init 的 物理/逻辑）
+        self.scale_idx = 0
         
     def draw(self, ui):
         ui.heading("显示模式（单选）")
@@ -34,7 +36,16 @@ class HUD(egui.UiBase):
                 self.mode = i
         ui.separator()
         ui.label(self.info)
-        ui.label("手机：物理面恒全屏 = 画布比例差异（letterbox）")
+        # UI 缩放档位（手机视觉自调——set_scale 即时生效，ppp 实测显示）
+        tag = "自动" if self.scale_idx == 0 else f"×{self.scales[self.scale_idx]:g}"
+        if ui.button(f"UI 缩放 {tag}"):
+            self.scale_idx = (self.scale_idx + 1) % len(self.scales)
+            v = self.scales[self.scale_idx]
+            if v > 0:
+                egui.set_scale(v)
+            else:
+                egui.set_scale(1.0)  # 自动基准（init 的 物理/逻辑）
+        ui.label(f"当前 ppp≈{self.scales[self.scale_idx] if self.scale_idx else 1.0:g}")
         self.name = ui.text_edit(self.name)
 
 
@@ -79,15 +90,19 @@ async def main():
             pygame.gfxdraw.rectangle(t, (-w // 2, -h // 2, w, h))
             pygame.gfxdraw.line(t, -40, 0, 40, 0)
             pygame.gfxdraw.line(t, 0, -40, 0, 40)
+            # 100px 标尺线（水平/垂直各一条——"变大"视觉量化基准）
+            pygame.gfxdraw.set_color(t, (255, 220, 60))
+            pygame.gfxdraw.line(t, -100, 130, 0, 130)
+            pygame.gfxdraw.line(t, 0, 130, 0, 30)
             # 四角标记（画布四角一眼可辨）
             for cx in (-w // 2, w // 2 - 20):
                 for cy in (-h // 2, h // 2 - 20):
                     pygame.gfxdraw.box(t, (cx, cy, 20, 20))
 
-            # 信息面板
+            # 信息面板 + 实时尺寸（2026-11-14 缩放量化——"变大"现象实测）
             name = MODES[applied][0]
             phys = pygame.render.screen_size()
-            hud.info = f"mode={name}  logical={w}x{h}  physical={phys[0]}x{phys[1]}"
+            hud.info = f"mode={name}  logical={w}x{h}  physical={phys[0]}x{phys[1]}  frame={frame}"
             t.draw_ui(hud)
 
         pygame.display.flip()
