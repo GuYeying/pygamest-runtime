@@ -29,13 +29,15 @@ chacha20poly1305 = { version = "0.10", default-features = false, features = ["al
 # 能力轴透传（对齐 pygamest 同名轴）：default = 全量形态；剔除 =
 # --no-default-features 或按需组合（打包脚本 --features 透传）。
 # ⚠️ ozz 入 default → 构建须 nightly 工具链（上游 std::simd）。
-default = ["gui", "physics2d", "physics3d", "spine", "live2d", "ozz"]
+default = ["gui", "physics2d", "physics3d", "spine", "live2d", "ozz", "voxelis", "tilemap"]
 gui = ["pygamest/gui"]
 physics2d = ["pygamest/physics2d"]
 physics3d = ["pygamest/physics3d"]
 spine = ["pygamest/spine"]
 live2d = ["pygamest/live2d"]
 ozz = ["pygamest/ozz"]
+voxelis = ["pygamest/voxelis"]
+tilemap = ["pygamest/tilemap"]
 # 全量标准库（开发/调试用——生产导出缺省不含）
 stdlib-full = ["pygamest/stdlib-full"]
 

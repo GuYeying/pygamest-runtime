@@ -517,6 +517,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "base64"
+version = "0.22.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
+
+[[package]]
 name = "bimap"
 version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1742,6 +1748,12 @@ dependencies = [
 
 [[package]]
 name = "glam"
+version = "0.29.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8babf46d4c1c9d92deac9f7be466f76dfc4482b6452fc5024b5e8daf6ffeb3ee"
+
+[[package]]
+name = "glam"
 version = "0.30.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19fc433e8437a212d1b6f1e68c7824af3aed907da60afa994e7f542d18d12aa9"
@@ -2854,7 +2866,7 @@ dependencies = [
  "itertools 0.14.0",
  "libm",
  "malachite-base",
- "wide",
+ "wide 1.7.1",
 ]
 
 [[package]]
@@ -2910,6 +2922,16 @@ checksum = "8ea1f30cedd69f0a2954655f7188c6a834246d2bcf1e315e2ac40c4b24dc9519"
 dependencies = [
  "cfg-if",
  "rayon",
+]
+
+[[package]]
+name = "md-5"
+version = "0.10.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d89e7ee0cfbedfc4da3340218492196241d89eefb6dab27de5df917a6d2e78cf"
+dependencies = [
+ "cfg-if",
+ "digest",
 ]
 
 [[package]]
@@ -4225,7 +4247,9 @@ dependencies = [
  "chacha20poly1305",
  "egui-starfish-we",
  "egui-wgpu",
+ "glam 0.29.3",
  "glam 0.33.12",
+ "parking_lot",
  "pollster",
  "pygame_live2d",
  "pygame_ozz",
@@ -4248,6 +4272,8 @@ dependencies = [
  "starfish-time",
  "starfish-video",
  "starfish-we",
+ "tiled",
+ "voxelis",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wgpu",
@@ -4256,14 +4282,13 @@ dependencies = [
 [[package]]
 name = "pygamest-dev"
 version = "0.1.12"
-source = "git+https://github.com/GuYeying/pygamest-dev#5e44bd6f5c568675ef499fff03e0a37dbea9621e"
 dependencies = [
  "android-activity",
  "jni-sys 0.3.1",
  "ndk-context",
  "pygamest",
  "starfish-debug",
- "starfish-dialog",
+ "starfish-dialog 0.9.73 (git+https://github.com/GuYeying/starfish)",
  "starfish-io",
  "starfish-pygame",
  "starfish-std",
@@ -4307,6 +4332,15 @@ name = "quick-error"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a993555f31e5a609f617c12db6250dedcac1b0a85076912c436e6fc9b2c8e6a3"
+
+[[package]]
+name = "quick-xml"
+version = "0.31.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1004a344b30a54e2ee58d66a71b32d2db2feb0a31f9a2d302bf0536f15de2a33"
+dependencies = [
+ "memchr",
+]
 
 [[package]]
 name = "quick-xml"
@@ -4498,7 +4532,7 @@ dependencies = [
  "simba",
  "static_assertions",
  "thiserror 2.0.21",
- "wide",
+ "wide 1.7.1",
 ]
 
 [[package]]
@@ -4521,7 +4555,7 @@ dependencies = [
  "simba",
  "static_assertions",
  "thiserror 2.0.21",
- "wide",
+ "wide 1.7.1",
 ]
 
 [[package]]
@@ -5253,6 +5287,15 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "safe_arch"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96b02de82ddbe1b636e6170c21be622223aea188ef2e139be0a5b219ec215323"
+dependencies = [
+ "bytemuck",
+]
+
+[[package]]
+name = "safe_arch"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42c6efa15875e6ecb39ca61fb0b0c1a40b84fac5a5ffe71eef7d1000c8eb3f5f"
@@ -5414,7 +5457,7 @@ dependencies = [
  "approx",
  "num-complex",
  "num-traits",
- "wide",
+ "wide 1.7.1",
 ]
 
 [[package]]
@@ -5602,13 +5645,12 @@ dependencies = [
 [[package]]
 name = "starfish-audio"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "bytemuck",
  "cpal",
  "log",
  "starfish-debug",
- "starfish-dialog",
+ "starfish-dialog 0.9.73",
  "starfish-io",
  "starfish-permission",
  "symphonia",
@@ -5620,10 +5662,26 @@ dependencies = [
 [[package]]
 name = "starfish-debug"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "log",
  "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "starfish-dialog"
+version = "0.9.73"
+dependencies = [
+ "jni 0.21.1",
+ "js-sys",
+ "log",
+ "rfd 0.15.4",
+ "robius-android-env",
+ "robius-file-picker",
+ "starfish-debug",
+ "starfish-permission",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
  "web-sys",
 ]
 
@@ -5648,7 +5706,6 @@ dependencies = [
 [[package]]
 name = "starfish-font"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "bytemuck",
  "glam 0.33.12",
@@ -5661,7 +5718,6 @@ dependencies = [
 [[package]]
 name = "starfish-gamepad"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "gilrs",
  "js-sys",
@@ -5672,7 +5728,6 @@ dependencies = [
 [[package]]
 name = "starfish-gfx"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "bytemuck",
  "glam 0.33.12",
@@ -5683,7 +5738,6 @@ dependencies = [
 [[package]]
 name = "starfish-io"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "js-sys",
  "ndk",
@@ -5697,7 +5751,6 @@ dependencies = [
 [[package]]
 name = "starfish-net"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "js-sys",
  "starfish-debug",
@@ -5709,7 +5762,6 @@ dependencies = [
 [[package]]
 name = "starfish-permission"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "jni 0.21.1",
  "js-sys",
@@ -5725,7 +5777,6 @@ dependencies = [
 [[package]]
 name = "starfish-pygame"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "bytemuck",
  "chacha20poly1305",
@@ -5740,7 +5791,7 @@ dependencies = [
  "sha2",
  "starfish-audio",
  "starfish-debug",
- "starfish-dialog",
+ "starfish-dialog 0.9.73",
  "starfish-font",
  "starfish-gamepad",
  "starfish-gfx",
@@ -5761,7 +5812,6 @@ dependencies = [
 [[package]]
 name = "starfish-render"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "bytemuck",
  "glam 0.33.12",
@@ -5779,7 +5829,6 @@ dependencies = [
 [[package]]
 name = "starfish-std"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "console_error_panic_hook",
  "pollster",
@@ -5792,7 +5841,6 @@ dependencies = [
 [[package]]
 name = "starfish-time"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "web-sys",
 ]
@@ -5800,7 +5848,6 @@ dependencies = [
 [[package]]
 name = "starfish-video"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "gstreamer",
  "gstreamer-app",
@@ -5830,7 +5877,6 @@ dependencies = [
 [[package]]
 name = "starfish-we"
 version = "0.9.73"
-source = "git+https://github.com/GuYeying/starfish#6c5c93e57df83b61718cd4e977ab6455fa3644ac"
 dependencies = [
  "android-activity",
  "jni-sys 0.3.1",
@@ -6198,6 +6244,17 @@ dependencies = [
  "quick-error",
  "weezl",
  "zune-jpeg",
+]
+
+[[package]]
+name = "tiled"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "267cbf8cb938ae27267fccf769e891e646318e8279e5a15bb75fc6b0e4f1d834"
+dependencies = [
+ "base64",
+ "flate2",
+ "quick-xml 0.31.0",
 ]
 
 [[package]]
@@ -6584,6 +6641,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
+name = "voxelis"
+version = "25.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e43c457d749220bab9527780a759bf999182c201716bc33fd4e3de0bb7a02c19"
+dependencies = [
+ "bitflags 2.13.2",
+ "byteorder",
+ "glam 0.29.3",
+ "md-5",
+ "parking_lot",
+ "rayon",
+ "rustc-hash 2.1.3",
+ "voxelis-memory",
+ "wide 0.7.33",
+ "zstd",
+]
+
+[[package]]
+name = "voxelis-memory"
+version = "25.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c5f721aa094c58da48cbae05f27725b215fb2c8bdd10b1d74d2111cd4a4ddada"
+
+[[package]]
 name = "walkdir"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6783,7 +6864,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "338e30461b3a2b67d70eb30a6d89f8e0c93a833e07d2ae89085cd070c4a00ac0"
 dependencies = [
  "proc-macro2",
- "quick-xml",
+ "quick-xml 0.41.0",
  "quote",
 ]
 
@@ -7035,12 +7116,22 @@ dependencies = [
 
 [[package]]
 name = "wide"
+version = "0.7.33"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ce5da8ecb62bcd8ec8b7ea19f69a51275e91299be594ea5cc6ef7819e16cd03"
+dependencies = [
+ "bytemuck",
+ "safe_arch 0.7.4",
+]
+
+[[package]]
+name = "wide"
 version = "1.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d920ac99c3c8edce110cb8d07dbb324d6d026011dce85b1e9355b70f0adacc4f"
 dependencies = [
  "bytemuck",
- "safe_arch",
+ "safe_arch 1.2.0",
 ]
 
 [[package]]
@@ -7593,6 +7684,34 @@ name = "zmij"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"
+
+[[package]]
+name = "zstd"
+version = "0.13.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50adf04cf3ec914b0b9905c9dde90c80fe74bfd701e331fc80a39c512c525278"
+dependencies = [
+ "zstd-safe",
+]
+
+[[package]]
+name = "zstd-safe"
+version = "7.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "498d94ad68720c89b4fbe41b9090850651e68cb2dd9210ce7ffbff3a94653819"
+dependencies = [
+ "zstd-sys",
+]
+
+[[package]]
+name = "zstd-sys"
+version = "2.1.3+zstd.1.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f729a06d0257428fd9d997ac8db7e1407bd0262ab016b085b36bc52957c0052d"
+dependencies = [
+ "cc",
+ "pkg-config",
+]
 
 [[package]]
 name = "zune-core"

@@ -46,6 +46,8 @@ CRATE = Path(__file__).resolve().parent.parent
 ANDROID = CRATE / "android"
 JNI_LIBS = ANDROID / "jniLibs"
 ABI = "arm64-v8a"
+import os as _os
+ABI = _os.environ.get("PYGST_ANDROID_ABI", ABI)  # 模拟器 x86_64 镜像原生跑（2026-11-16——env 覆盖)
 LIB_NAME = "runtime_android"          # 清单 lib_name（dlopen 锚点）
 SO_NAME = f"lib{LIB_NAME}.so"
 OUT_DIR = CRATE / "target" / "apk"
