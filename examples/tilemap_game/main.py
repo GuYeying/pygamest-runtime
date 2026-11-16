@@ -12,60 +12,6 @@ import pygame_tilemap
 MW, MH = 12, 8
 
 
-def gen_tmx():
-    ground = []
-    deco = []
-    fx = []
-    for y in range(MH):
-        for x in range(MW):
-            # ground：4 瓦片棋盘随机（GID 1..4，firstgid=1）
-            ground.append(1 + ((x * 7 + y * 13) % 4))
-            # deco：稀疏装饰瓦片（GID 5..8，firstgid=5）
-            if (x % 5 == 2 and y % 3 == 1) or (x, y) in ((0, 0), (11, 7)):
-                deco.append(5 + ((x + y) % 4))
-            else:
-                deco.append(0)
-            # fx：底部两行水面（GID 9..12，firstgid=9）
-            if y >= MH - 2:
-                fx.append(9 + ((x + y) % 4))
-            else:
-                fx.append(0)
-
-    def csv(vals):
-        return ",".join(str(v) for v in vals)
-
-    return (
-        '<?xml version="1.0" encoding="UTF-8"?>\n'
-        f'<map version="1.10" orientation="orthogonal" renderorder="right-down" '
-        f'width="{MW}" height="{MH}" tilewidth="32" tileheight="32" '
-        f'infinite="0" nextlayerid="4" nextobjectid="1">\n'
-        # 图集引用 = 占位 path（tiled 解析不读图字节——shader 程序化
-        # 纹理，真图集链 v2 验）
-        f' <tileset firstgid="1" name="ground" tilewidth="32" tileheight="32" '
-        f'tilecount="4" columns="4">\n'
-        f'  <image source="atlas_ground.png" width="128" height="32"/>\n'
-        f' </tileset>\n'
-        f' <tileset firstgid="5" name="deco" tilewidth="32" tileheight="32" '
-        f'tilecount="4" columns="4">\n'
-        f'  <image source="atlas_deco.png" width="128" height="32"/>\n'
-        f' </tileset>\n'
-        f' <tileset firstgid="9" name="fx" tilewidth="32" tileheight="32" '
-        f'tilecount="4" columns="4">\n'
-        f'  <image source="atlas_fx.png" width="128" height="32"/>\n'
-        f' </tileset>\n'
-        f' <layer id="1" name="ground" width="{MW}" height="{MH}">\n'
-        f'  <data encoding="csv">{csv(ground)}</data>\n'
-        f' </layer>\n'
-        f' <layer id="2" name="deco" width="{MW}" height="{MH}">\n'
-        f'  <data encoding="csv">{csv(deco)}</data>\n'
-        f' </layer>\n'
-        f' <layer id="3" name="fx" width="{MW}" height="{MH}">\n'
-        f'  <data encoding="csv">{csv(fx)}</data>\n'
-        f' </layer>\n'
-        f'</map>\n'
-    )
-
-
 # ── WGSL 层 shader 三部曲（程序化瓦片纹——UV 图集域 128×32，4 瓦列
 # 色板 + 瓦内网点；camera/phase 槽位一致）──
 WGSL_HEAD = """
