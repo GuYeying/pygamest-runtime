@@ -37,8 +37,8 @@ class HUD(egui.UiBase):
 
 async def main():
     pygame.display.set_caption("window_mode_test")
-    egui.init()
     screen = pygame.display.set_mode((800, 450))
+    egui.init()   # 须在 set_mode 之后（GPU 面——拆步装配定约）
     hud = HUD()
     applied = 1
     frame = 0
