@@ -1,8 +1,21 @@
-# pack.toml——游戏打包配置（单一配置源：build.rs / build_windows.py 同读）
+# pack.toml——游戏打包配置（单一配置源：build.rs / build_windows.py /
+# build_wasm.py / android/build.py 同读）。
+#
+# buildozer 风格常用参数（2026-11-17 扩展批）——每个参数都有消费点，
+# 未列出的参数不解析（垫底原则：写了也不生效，宁缺毋滥）。
 
 [game]
+# 游戏内部名（产物目录名 / android 包活动归属）
 name = "voxel_game"
+# 入口脚本名（root 下 main.py 的 main——无扩展名）
 entry = "main"
+# 窗口标题 + android 应用显示名（label）——build_windows 生成器/
+# android manifest __GAME_NAME__ 替换共用此值
+title = "voxel_game"
+# 版本串（android versionName 覆盖；windows 产物目录附带）
+version = "0.1.0"
+# 应用图标（android res 内 png 相对路径——windows .ico 嵌入为 v2）
+# icon = "assets/icon.png"
 
 [build]
 # key_file 相对**游戏项目根**（[scripts] root）——每游戏一份密钥；
@@ -10,6 +23,9 @@ entry = "main"
 key_file = "assets.key"
 magic = "SFXE1"
 out = "dist"
+# cargo features 透传（逗号分隔叠加轴——voxelis/tilemap/multi-window…
+# build_windows/android 构建命令追加；不写 = default 形态）
+features = "voxelis,tilemap"
 
 [pack]
 # 剔除 glob（对资源 bundle 生效；相对资源目录）。密钥文件由管线恒剔除
@@ -17,19 +33,33 @@ out = "dist"
 ignore = ["*.log"]
 
 [scripts]
+# 游戏项目根（入口脚本 main.py + assets.key 所在）
 root = "examples/voxel_game"
 
 [resources]
-# dir 末段目录名 = 发行资源目录名（build.rs 解析同名值 → RES_DIR_NAME 编译进壳）
+# dir 末段目录名 = 发行资源目录名（build.rs 解析同名值 → RES_DIR_NAME
+# 编译进壳——游戏相对路径默认落该资源目录）
 dir = "examples/voxel_game/assets"
 
 [windows]
+# 产物 exe 名覆盖（缺省 = [game] name）。exe + 资源目录同名同位
+# exe_name = "voxel_game"
 
 [android]
-package = "org.runtime.eguiapp"
-# 横竖屏（Android 原生 screenOrientation 取值）——与 dev 侧 --orientation
-# 同语义：landscape / portrait / sensorLandscape / sensorPortrait…
-orientation = "sensorLandscape"
+# 应用包名（android:package——Java 活动归属反转域）
+package = "org.runtime.voxelgame"
+# 横竖屏（Android 原生 screenOrientation 取值）——landscape / portrait /
+# sensorLandscape / sensorPortrait…
+orientation = "landscape"
+# 应用显示名覆盖（缺省 = [game] title）
+# app_name = "体素游戏"
+# 版本号覆盖（缺省 = [game] version——versionCode 由 build_id 自动生成）
+# version_code = 1
+# ABI 覆盖（arm64-v8a 默认——真机；x86_64 = 模拟器原生跑）
+# abi = "x86_64"
+# 追加权限（uses-permission android:name 逐行追加——INTERNET/
+# WRITE_EXTERNAL_STORAGE 已内置）
+# permissions = ["CAMERA", "RECORD_AUDIO"]
 
 [wasm]
 # 资源前缀（wasm 导出嵌网站子路径时的资源根 URL——如 "games/anim3"；

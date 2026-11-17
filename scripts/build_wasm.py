@@ -186,6 +186,17 @@ def _argv_value(flag: str, default: str = "") -> str:
 def main():
     game = _argv_value("--game", "hello_word")
     features = _argv_value("--features")
+    # pack.toml [build] features 作缺省（argv 显式传时覆盖）
+    cfg_features = ""
+    _pt = CRATE / "scripts" / "pack.toml"
+    if _pt.is_file():
+        for _line in _pt.read_text(encoding="utf-8").splitlines():
+            _t = _line.strip()
+            if _t.startswith("features") and "=" in _t and "ignore" not in _t:
+                cfg_features = _t.split("=", 1)[1].strip().strip(chr(34) + chr(39))
+                break
+    if not features and cfg_features:
+        features = cfg_features
     no_default = "--no-default-features" in sys.argv
     game_dir = CRATE / "examples" / game
     out = CRATE / "dist" / f"{game}-web"

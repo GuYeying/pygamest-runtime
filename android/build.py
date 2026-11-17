@@ -91,9 +91,18 @@ def main():
     if not game_dir.is_dir():
         sys.exit(f"[FAIL] 游戏目录不存在: {game_dir}")
 
-    # 配置（pack.toml 单一配置源）
-    cfg = load(CRATE / "scripts" / "pack.toml").get("android", {})
+    # 配置（pack.toml 单一配置源）——android 节 + game 节（title/version）
+    full_cfg = load(CRATE / "scripts" / "pack.toml")
+    cfg = full_cfg.get("android", {})
     orientation = cfg.get("orientation", "landscape")
+    game_title = full_cfg.get("game", {}).get("title", args.game)
+    game_version = full_cfg.get("game", {}).get("version", "0.1.0")
+    app_name = cfg.get("app_name", game_title)
+    # ABI 覆盖链：env PYGST_ANDROID_ABI > pack.toml [android] abi > 默认
+    cfg_abi = cfg.get("abi", "")
+    if cfg_abi and not _os.environ.get("PYGST_ANDROID_ABI"):
+        _os.environ["PYGST_ANDROID_ABI"] = cfg_abi
+    permissions = cfg.get("permissions", "")
 
     sdk = Path("D:/SDK/Android")
     bt = best_subdir(sdk / "build-tools", "")
@@ -275,12 +284,22 @@ def main():
     WORK.mkdir(parents=True, exist_ok=True)
     ver_code = time.strftime("%m%d%H%M%S")
     build_id = "rt-" + time.strftime("%Y%m%d-%H%M%S")
+    ver_name = game_version if game_version != "0.1.0" else build_id
     mtext = (ANDROID / "AndroidManifest.xml").read_text(encoding="utf-8")
     mtext = (mtext.replace("__LIB_NAME__", LIB_NAME)
                   .replace("__ORIENTATION__", orientation)
-                  .replace("__GAME_NAME__", args.game)
+                  .replace("__GAME_NAME__", app_name)
                   .replace('android:versionCode="1"', f'android:versionCode="{ver_code}"')
-                  .replace('android:versionName="0.1.0"', f'android:versionName="{build_id}"'))
+                  .replace('android:versionName="0.1.0"', f'android:versionName="{ver_name}"'))
+    # 追加权限（pack.toml [android] permissions——逗号分隔清单）
+    perm_lines = ""
+    for p in str(permissions).replace("[", "").replace("]", "").replace("'", "").replace('"', "").split(","):
+        p = p.strip()
+        if p:
+            perm_lines += f'    <uses-permission android:name="android.permission.{p}" />
+'
+    if perm_lines:
+        mtext = mtext.replace("</manifest>", perm_lines + "</manifest>")
     m = WORK / "AndroidManifest.xml"
     m.write_text(mtext, encoding="utf-8")
     base_apk = WORK / "base.apk"

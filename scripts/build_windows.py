@@ -30,7 +30,8 @@ def main():
     crate_root = os.path.dirname(script_dir)
     config_path = os.path.join(script_dir, "pack.toml")
     target = "windows"
-    features = ""
+    cfg = load(config_path).get("build", {})
+    features = str(cfg.get("features", ""))
     no_default = False
     for i, a in enumerate(sys.argv):
         if a == "--config":
@@ -44,6 +45,12 @@ def main():
 
     cfg = get_target(load(config_path), target)
     name = cfg.get("name", "game")
+    title = cfg.get("title", name)
+    version = cfg.get("version", "0.1.0")
+    # [build] features 作 argv 缺省（pack.toml 单一配置源——argv 显式传时覆盖）
+    cfg_features = str(load(config_path).get("build", {}).get("features", ""))
+    if not features and cfg_features:
+        features = cfg_features
     entry = cfg.get("entry", "main")
     key_file = cfg.get("key_file", "assets.key")
     magic = cfg.get("magic", "SFXE1").encode()
