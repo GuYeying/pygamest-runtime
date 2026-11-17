@@ -137,14 +137,21 @@ def fps_view(eye, yaw_deg, pitch_deg):
     fx = M.cos(pitch) * M.sin(yaw)
     fy = M.sin(pitch)
     fz = -M.cos(pitch) * M.cos(yaw)
-    f = (fx, fy, fz)                       # 前向
+    f = (fx, fy, fz)                       # 前向（单位——三角恒等式保证）
     up0 = (0.0, 1.0, 0.0)
-    s = (fy * up0[2] - fz * up0[1],
-         fz * up0[0] - fx * up0[2],
-         fx * up0[1] - fy * up0[0])        # right = f × up
-    u = (s[1] * fz - s[2] * fx,
+    s0 = (fy * up0[2] - fz * up0[1],
+          fz * up0[0] - fx * up0[2],
+          fx * up0[1] - fy * up0[0])       # right = f × up（模 = cos(pitch)
+                                            # ≠ 1——**必须归一化**，否则
+                                            # pitch 越大横竖缩放越失配 =
+                                            # 旋转画面拉伸畸变，2026-11-17
+                                            # 用户实测报障根因）
+    sn = (s0[0] * s0[0] + s0[1] * s0[1] + s0[2] * s0[2]) ** 0.5
+    s = (s0[0] / sn, s0[1] / sn, s0[2] / sn)
+    u = (s[1] * fz - s[2] * fy,
          s[2] * fx - s[0] * fz,
-         s[0] * fy - s[1] * fx)            # true up = s × f
+         s[0] * fy - s[1] * fx)            # true up = s × f（s⊥f 双单位
+                                            # → u 自动单位）
     ex, ey, ez = eye
     # 视图基（行主视觉——标准 view 行向量）→ 列主展开（from_cols_array
     # 列主序契约：out[c*4+r] = m[r*4+c]）
@@ -226,17 +233,21 @@ async def main():
         for z in range(16):
             h = height[x][z]
             add_collider((x, h - 1, z))      # 每列顶层块（内部块打不到）
+        # 石块样本 collider（值 2 两块——build_terrain 放在列顶层之上，
+        # 列循环只挂到 h-1 顶层，这两块漏挂 = 渲染有块物理穿透 bug）
+        add_collider((3, height[3][3], 3))
+        add_collider((5, height[5][5], 5))
 
     # 时序契约：insert 后须至少 step 一次方可 cast_ray（broad_phase 时序）
     world.step_frame(1.0 / 60.0)
-    hit = world.cast_ray((8.0, 8.0, 8.0), (0.0, -1.0, 0.0), None)
+    hit = world.cast_ray_filtered((8.0, 8.0, 8.0), (0.0, -1.0, 0.0), None, "only_fixed")
     st("cast_ray 命中地面", hit is not None and hit[1] > 0.0)
 
     # ── 相机（GameCamera 显式定约——perspective letterbox 内聚）──
     eye = [8.0, 9.0, 22.0]
     yaw, pitch = 0.0, -12.0
     cam = pygame.render.game_camera_perspective(
-        58.0, 1024, 640, 1024, 640, 0.1, 300.0)
+        48.0, 1024, 640, 1024, 640, 0.1, 300.0)
     screen.set_camera(cam)                   # 会话级显式相机（空档自动面）
     cam_buf = ac.buffer(64, label="cam_buf")
     model_buf = ac.buffer(64, label="model_buf")
@@ -271,16 +282,21 @@ async def main():
 
     # ── 发射方块（动态立方体——collider half 0.5 ≡ 渲染 scale 1.0，
     # 尺寸严格对齐；物理验证核心样张）──
+    # ⚠️ 每球**独立 model uniform + bind**（2026-11-17 修复：RawPass 是
+    # 记录-回放（draw 排程到 present 收口执行），而 write_buffer 立即
+    # 生效——共享一个 model_buf 时回放读到的是**最后一次写入**的矩阵，
+    # 多球全部叠在同一位置 = "上次发射的消失了"的假象（物理体其实
+    # 都在）。独立 buffer 后每球矩阵各自定格，互不覆盖）
     ball_mesh = ac.mesh(["float32x3", "float32x3"], CUBE_VERTS, label="ball_mesh")
-    ball_bind = ac.bind_group([
+    ball_bind0 = ac.bind_group([
         (0, "uniform", cam_buf),
         (1, "uniform", model_buf),
     ], label="ball_bind")
-    ball_pipe = ac.pipeline(cube_shader, ball_mesh, [ball_bind],
+    ball_pipe = ac.pipeline(cube_shader, ball_mesh, [ball_bind0],
                             cull="back", blend="opaque",
                             depth_mode="standard", depth_write=True,
                             label="ball_pipe")
-    balls = []                               # body handle 流
+    balls = []          # (body_handle, model_buf, bind) 流
 
     def launch_ball():
         yaw_r = M.radians(yaw)
@@ -293,7 +309,13 @@ async def main():
                                    linvel=(d[0] * 9.0, d[1] * 9.0, d[2] * 9.0))
         c = rp3.ColliderBuilder3D("cuboid", hx=0.5, hy=0.5, hz=0.5,
                                   density=1.5, restitution=0.2, friction=0.6)
-        balls.append(world.insert(b, c)[0])
+        bh = world.insert(b, c)[0]
+        mbuf = ac.buffer(64, label=f"ball_model_{len(balls)}")
+        bind = ac.bind_group([
+            (0, "uniform", cam_buf),
+            (1, "uniform", mbuf),
+        ], label=f"ball_bind_{len(balls)}")
+        balls.append((bh, mbuf, bind))
 
     # ── 射线交互（删除/放置 + collider 同步 + remesh）──
     info = ""
@@ -307,7 +329,7 @@ async def main():
 
     def pick_voxel():
         d = mouse_ray()
-        hit = world.cast_ray(tuple(eye), d, None)
+        hit = world.cast_ray_filtered(tuple(eye), d, None, "only_fixed")
         if hit is None:
             return None
         toi = hit[1]
@@ -347,6 +369,9 @@ async def main():
 
     dragging = False
     last_pos = None                       # 拖拽差分锚（Event 无 rel——x/y 差分自算）
+    debug_on = False                      # D 键：collider 线框叠加（对齐检查）
+    dbg_draw = rp3.DebugDraw3D()
+    dbg_renderer = rp3.DebugLinesRenderer3D()   # 相机由 set_mvp 直写（默认构造即可）
     text_cache = {}
 
     def hud_text(s, color=(210, 214, 224)):
@@ -359,9 +384,10 @@ async def main():
         pygame.gfxdraw.set_transform(rt, M.mat4_translation(-500, 308, 0))
         pygame.gfxdraw.draw_surface(rt, hud_text(
             f"[voxel_mc] 体素 mesh {tri_count} 三角 | chunk {vw.chunk_count()} | "
-            f"球 {len(balls)} | WASD+QE 漫游 拖拽转向 左删 右放 F 发射 R 重置"))
+            f"球 {len(balls)} | WASD漫游 QE升降 拖拽=转向+俯仰 左删右放 F发射 R重置 T线框"))
         pygame.gfxdraw.set_transform(rt, M.mat4_translation(-500, 288, 0))
-        pygame.gfxdraw.draw_surface(rt, hud_text(info, (255, 220, 90)))
+        pygame.gfxdraw.draw_surface(rt, hud_text(
+            info + (" | T:collider线框 ON" if debug_on else ""), (255, 220, 90)))
 
     while True:
         for e in pygame.event.get():
@@ -372,20 +398,32 @@ async def main():
                     return
                 if e.key == pygame.key.K_f:
                     launch_ball()
+                if e.key == pygame.key.K_t:
+                    debug_on = not debug_on
                 if e.key == pygame.key.K_r:
                     for bh in list(col_bodies.values()):
                         world.remove_body(bh)
                     col_bodies.clear()
+                    for bh, _mb, _bd in balls:
+                        world.remove_body(bh)
+                    balls.clear()
                     vw.clear()
                     build_terrain()
                     # 表面 collider 重建（R 全量重置——放置块一并清）
                     for x in range(16):
                         for z in range(16):
                             h = height[x][z]
+                            add_collider((3, height[3][3], 3))
+                            add_collider((5, height[5][5], 5))
                             add_collider((x, h - 1, z))
                     world.step_frame(1.0 / 60.0)   # 时序契约（cast_ray 前置）
                     vox_mesh, tri_count = rebuild_voxel_mesh()
-                    info = "地形已重置"
+                    info = "地形+视角已重置"
+                    # 视角同步归位（pitch 残留低俯角 = "旋转看起来绕斜轴"
+                    # 的观感来源——R 全量重置含视角）
+                    eye[0], eye[1], eye[2] = 8.0, 9.0, 22.0
+                    yaw = 0.0
+                    pitch = -12.0
             elif e.type == pygame.event.MOUSEBUTTONDOWN:
                 if e.button == 1:
                     dragging = True
@@ -410,9 +448,12 @@ async def main():
                 if e.button == 1:
                     dragging = False
             elif e.type == pygame.event.MOUSEMOTION and dragging:
+                # 拖拽 = 转向 + 俯仰（FPS 全形态——x 差分 yaw / y 差分
+                # pitch，用户定约 2026-11-17）
                 if last_pos is not None:
                     yaw += (e.x - last_pos[0]) * 0.35
-                    pitch = max(-85.0, min(85.0, pitch + (e.y - last_pos[1]) * 0.35))
+                    pitch = max(-85.0, min(85.0,
+                                           pitch + (e.y - last_pos[1]) * 0.35))
                 last_pos = (e.x, e.y)
 
         # 漫游（WASD 平移 + QE 升降——get_pressed 视图，Key unhashable）
@@ -447,18 +488,25 @@ async def main():
                 p.set_pipeline(vox_pipe[0])
                 p.set_bind_group(0, vox_bind[0])
                 p.draw_mesh(vox_mesh)
-                # 球（平移 + **旋转回填**——Quaternion xyzw 直呼构造 →
-                # mat4_from_quat；物理翻滚碰撞与渲染姿态严格同步）
-                for bh in balls:
+                # 球（平移 + **旋转回填**——每球独立 model uniform，
+                # 回放时矩阵各自定格不互覆盖；Quaternion xyzw 直呼构造）
+                for bh, mbuf, bind in balls:
                     x, y, z = world.translation(bh)
                     qx, qy, qz, qw = world.rotation(bh)
                     ac.write_buffer(
-                        model_buf,
+                        mbuf,
                         M.mat4_translation(x, y, z)
                         @ M.mat4_from_quat(M.Quaternion(qx, qy, qz, qw)))
                     p.set_pipeline(ball_pipe)
-                    p.set_bind_group(0, ball_bind)
+                    p.set_bind_group(0, bind)
                     p.draw_mesh(ball_mesh)
+            if debug_on:
+                # collider 线框叠加（D 键——set_mvp 绝对对齐：与主管线
+                # 喂同一个 cam.mvp()，投影/view/near/far 全同）
+                sink = rp3.LineSink3D()
+                rp3.collect3d(world, dbg_draw, sink)
+                dbg_renderer.set_mvp(cam.mvp())
+                rt.draw_debug_3d(dbg_renderer, sink)
             draw_hud(rt)
 
         # 物理数据正确性打点（60 帧一次）：球中心/速度——静止贴面判据
@@ -466,9 +514,9 @@ async def main():
         if frame == 120 and not balls:
             launch_ball()   # 自动发射一颗（落地核对打点——无人交互自动触发）
         if frame % 60 == 0 and balls:
-            vx, vy, vz = world.linvel(balls[0])
+            vx, vy, vz = world.linvel(balls[0][0])
             spd = (vx * vx + vy * vy + vz * vz) ** 0.5
-            x, y, z = world.translation(balls[0])
+            x, y, z = world.translation(balls[0][0])
             if spd < 0.05:
                 # 体素查询判定（cast_ray 会命中球自身 collider → toi=0，
                 # 非引擎异常）：球心下方 0.6 处的支撑格有体素 → 格顶 =
